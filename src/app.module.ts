@@ -15,6 +15,7 @@ import { AuthResolver } from './resolvers/auth.resolver';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       debug: false,
       playground: true,
+      introspection: true,
     }),
   ],
   controllers: [AppController],
