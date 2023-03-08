@@ -7,6 +7,7 @@ import { PrismaService } from './prisma.service';
 import { HelloResolver } from './resolvers/hello.resolver';
 import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 import { AuthResolver } from './resolvers/auth.resolver';
+import { NewOfferResolver } from './resolvers/newOffer.resolver';
 
 @Module({
   imports: [
@@ -19,7 +20,13 @@ import { AuthResolver } from './resolvers/auth.resolver';
     }),
   ],
   controllers: [AppController],
-  providers: [PrismaService, AppService, HelloResolver, AuthResolver],
+  providers: [
+    PrismaService,
+    AppService,
+    HelloResolver,
+    AuthResolver,
+    NewOfferResolver,
+  ],
 })
 export class AppModule {
   constructor(private readonly prismaService: PrismaService) {}
