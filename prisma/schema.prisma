@@ -13,21 +13,22 @@ generator client {
 model User {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
   email          String        @unique
-  clerkId        String?       @unique
-  firstName      String
-  lastName       String
-  password       String
-  phoneNumber    String
+  clerkId        String       @unique
+  firstName      String?
+  userName      String
+  lastName       String?
+  password       String?
+  phoneNumber    String?
   userBio        String?
   avatar         String?
   userAddresses  UserAddress[]
-  reviews         Review[]
+  review         Review[]
   ordersAsSeller Order[]       @relation("sellerRelation")
   ordersAsBuyer  Order[]       @relation("buyerRelation")
   offers         Offer[]
   offerIds       String[]      @db.ObjectId
-  profileStatus  Boolean
-  isPro          Boolean
+  profileStatus  Boolean?
+  isPro          Boolean?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -38,13 +39,17 @@ model Offer {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   author      User     @relation(fields: [authorId], references: [id])
   authorId    String   @db.ObjectId
-  plantName String   @unique
+  plantName String   
   pictures  String[]
-  price     Int?
+  description String
+  price     Int
+  health String
+  category String
+  pot Boolean
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   // order     Order  @relation("orderPayments", fields: [orderId], references: [id])
-  orderId   String   @db.ObjectId
+//   orderId   String   @db.ObjectId
 
   @@map("offers")
 }

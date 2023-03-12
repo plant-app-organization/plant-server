@@ -1,13 +1,25 @@
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql'
 
 @InputType()
 export class OfferInput {
   @Field()
-  price: number;
+  price: number
 
   @Field()
-  plantName: string;
+  plantName: string
+
+  @Field(() => [String])
+  pictures: string[]
 
   @Field()
-  pictureUrl: string;
+  description: string
+
+  @Field()
+  category: string
+
+  @Field()
+  health: string
+
+  @Field()
+  pot: boolean
 }

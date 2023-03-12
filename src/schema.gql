@@ -7,20 +7,22 @@ type Query {
 }
 
 type Mutation {
-  register(registerInput: RegisterInput!): String!
+  register(newUserInput: RegisterInput!): String!
   createNewOffer(newOfferInput: OfferInput!): String!
 }
 
 input RegisterInput {
   email: String!
-  password: String!
-  birthYear: Float!
-  firstName: String!
-  lastName: String!
+  userName: String!
+  clerkId: String!
 }
 
 input OfferInput {
   price: Float!
   plantName: String!
-  pictureUrl: String!
+  pictures: [String!]!
+  description: String!
+  category: String!
+  health: String!
+  pot: Boolean!
 }

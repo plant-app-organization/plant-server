@@ -1,22 +1,15 @@
-import { InputType, Field } from '@nestjs/graphql';
-import { IsEmail, MinLength } from 'class-validator';
+import { InputType, Field } from '@nestjs/graphql'
+import { IsEmail, MinLength } from 'class-validator'
 
 @InputType()
 export class RegisterInput {
   @Field()
   @IsEmail()
-  email: string;
+  email: string
 
   @Field()
-  @MinLength(8)
-  password: string;
+  userName: string
 
   @Field()
-  birthYear: number;
-
-  @Field()
-  firstName: string;
-
-  @Field()
-  lastName: string;
+  clerkId: string
 }
