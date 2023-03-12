@@ -1,37 +1,122 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-datasource db {  
-    provider = "mongodb"
-    url = env("DATABASE_URL")
-} 
-generator client {  
-    provider = "prisma-client-js"
-} 
-model User {  
-    id     String   @id @default(auto()) @map("_id") @db.ObjectId  
-    email  String   @unique  
-    clerkId String? @unique
-    offers Offer[]
-    firstName   String?  
-    lastName   String?  
-    password  String?  
-    birthYear  Int?  
-    createdAt  DateTime  @default(now())  
-    updatedAt  DateTime  @updatedAt
-      @@map("users")
-
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
-model Offer {  
-    id     String   @id @default(auto()) @map("_id") @db.ObjectId  
-    plantName  String   @unique  
-    pictureUrl   String?  
-    price  Int?  
-    createdAt  DateTime  @default(now())  
-    updatedAt  DateTime  @updatedAt
-    author   User   @relation(fields: [authorId], references: [id])
-    authorId String @db.ObjectId // relation scalar field  (used in the `@relation` attribute above)
-      @@map("offers")
+generator client {
+  provider = "prisma-client-js"
+}
 
+model User {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  email          String        @unique
+  clerkId        String?       @unique
+  firstName      String
+  lastName       String
+  password       String
+  phoneNumber    String
+  userBio        String?
+  avatar         String?
+  userAddresses  UserAddress[]
+  reviews         Review[]
+  ordersAsSeller Order[]       @relation("sellerRelation")
+  ordersAsBuyer  Order[]       @relation("buyerRelation")
+  offers         Offer[]
+  offerIds       String[]      @db.ObjectId
+  profileStatus  Boolean
+  isPro          Boolean
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@map("users")
+}
+
+model Offer {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  author      User     @relation(fields: [authorId], references: [id])
+  authorId    String   @db.ObjectId
+  plantName String   @unique
+  pictures  String[]
+  price     Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // order     Order  @relation("orderPayments", fields: [orderId], references: [id])
+  orderId   String   @db.ObjectId
+
+  @@map("offers")
+}
+
+model UserAddress {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  cityName  String
+  address   String
+  latitude  Float
+  longitude Float
+  zipCode   Int
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   String   @db.ObjectId // relation scalar field  (used in the `@relation` attribute above)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("useraddresses")
+}
+
+model Plant {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  plantName   String
+  description String
+  price       Float
+  category    String[]
+  health      String
+  size        Float
+  age         Int
+  favorites   String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      Order[]
+
+  @@map("plants")
+}
+
+model Review {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  reviewAuthor   User     @relation(fields: [reviewAuthorId], references: [id])
+  reviewAuthorId String   @db.ObjectId
+  review_note    Int
+  reviewText     String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Order {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  seller     User      @relation("sellerRelation", fields: [sellerId], references: [id])
+  sellerId   String    @db.ObjectId
+  buyer      User      @relation("buyerRelation", fields: [buyerId], references: [id])
+  buyerId    String    @db.ObjectId
+  plant      Plant     @relation(fields: [plantId], references: [id])
+  plantId    String    @db.ObjectId
+  payments   Payment[] @relation("orderPayments")
+  priceOffer Float?
+  status     String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("orders")
+}
+
+model Payment {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  order             Order    @relation("orderPayments", fields: [orderId], references: [id])
+  orderId           String   @db.ObjectId
+  baseAmount        Float
+  totalAmount       Float
+  paymentTime       DateTime @default(now())
+  cardAccountNumber Int      @db.Int
+  transactionId     String   @db.ObjectId
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
