@@ -8,7 +8,7 @@ import { HelloResolver } from './resolvers/hello.resolver';
 import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 import { AuthResolver } from './resolvers/auth.resolver';
 import { NewOfferResolver } from './resolvers/newOffer.resolver';
-//comment
+//comments
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
