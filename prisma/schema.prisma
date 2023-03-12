@@ -11,6 +11,8 @@ generator client {
 model User {  
     id     String   @id @default(auto()) @map("_id") @db.ObjectId  
     email  String   @unique  
+    clerkId String? @unique
+    offers Offer[]
     firstName   String?  
     lastName   String?  
     password  String?  
@@ -28,6 +30,8 @@ model Offer {
     price  Int?  
     createdAt  DateTime  @default(now())  
     updatedAt  DateTime  @updatedAt
+    author   User   @relation(fields: [authorId], references: [id])
+    authorId String @db.ObjectId // relation scalar field  (used in the `@relation` attribute above)
       @@map("offers")
 
 }
