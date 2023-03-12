@@ -12,7 +12,7 @@ export class RegisterInput {
   password: string;
 
   @Field()
-  birthYear: number;
+  phoneNumber: String;
 
   @Field()
   firstName: string;

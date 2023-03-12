@@ -10,4 +10,19 @@ export class OfferInput {
 
   @Field()
   pictureUrl: string;
+
+  @Field()
+  cathegory: string;
+
+  @Field()
+  health: string;
+
+  @Field()
+  size: number;
+
+  @Field()
+  age: number;
+
+  @Field()
+  description: string;
 }
