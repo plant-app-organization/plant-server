@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma.service'
 import { OfferInput } from './offer.input'
 import { User } from '@prisma/client'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
-
+//comment
 @Resolver()
 export class NewOfferResolver {
   constructor(private prisma: PrismaService) {}
