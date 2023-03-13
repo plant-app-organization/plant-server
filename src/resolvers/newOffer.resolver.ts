@@ -11,7 +11,7 @@ export class NewOfferResolver {
   async createNewOffer(
     @Context() context,
     @Args('newOfferInput') offerInput: OfferInput,
-  ): Promise<string> {
+  ): Promise<boolean> {
     console.log('🔥offerInput dans le resolver newOffer', offerInput)
     const authorizationHeader = context.req.headers.authorization
     const token = authorizationHeader.split(' ')[1] // extract the token from the header
@@ -30,22 +30,28 @@ export class NewOfferResolver {
     })
 
     console.log('foundUser', foundUser)
-    const newOffer = await this.prisma.offer.create({
-      data: { ...offerInput, authorId: foundUser.id },
-    })
-    console.log('newOffer', newOffer)
+    try {
+      const newOffer = await this.prisma.offer.create({
+        data: { ...offerInput, authorId: foundUser.id },
+      })
+      console.log('newOffer', newOffer)
 
-    const updateUser = await this.prisma.user.update({
-      where: {
-        clerkId: client.sessions[0].userId,
-      },
-      data: {
-        offerIds: {
-          push: newOffer.id,
+      const updateUser = await this.prisma.user.update({
+        where: {
+          clerkId: client.sessions[0].userId,
         },
-      },
-    })
+        data: {
+          offerIds: {
+            push: newOffer.id,
+          },
+        },
+      })
+      console.log('updateUser', updateUser)
 
-    return 'New offer saved in DB'
+      return !!newOffer
+    } catch (error) {
+      // If an error occurred, return false
+      return false
+    }
   }
 }
