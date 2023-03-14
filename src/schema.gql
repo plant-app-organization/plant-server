@@ -2,8 +2,31 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Offer {
+  id: ID!
+  authorId: String!
+  price: Int!
+  plantName: String!
+  pictures: [String!]!
+  description: String!
+  category: String!
+  health: String!
+  pot: Boolean!
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Query {
   hello: String!
+
+  """Get List of Offers"""
+  OffersList: [Offer!]!
 }
 
 type Mutation {

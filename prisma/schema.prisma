@@ -27,7 +27,7 @@ model User {
   ordersAsBuyer  Order[]       @relation("buyerRelation")
   offers         Offer[]
   offerIds       String[]      @db.ObjectId
-  profileStatus  Boolean?
+  isActive  Boolean?
   isPro          Boolean?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
@@ -46,6 +46,7 @@ model Offer {
   health String
   category String
   pot Boolean
+  isActive Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   // order     Order  @relation("orderPayments", fields: [orderId], references: [id])
