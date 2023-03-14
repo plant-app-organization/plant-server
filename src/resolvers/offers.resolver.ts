@@ -6,6 +6,7 @@ import { User } from '@prisma/client'
 import { Offer } from './types/offer.model'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
 //comment
+//
 @Resolver()
 export class GetOffersResolver {
   constructor(private prisma: PrismaService) {}
