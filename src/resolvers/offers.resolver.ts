@@ -13,9 +13,9 @@ export class GetOffersResolver {
   @Query((returns) => [Offer], { name: 'OffersList', description: 'Get List of Offers' })
   async getOffers(
     @Context() context,
-    // @Args('newOfferInput') offerInput: OfferInput,
+    @Args('filters', { type: () => [String] }) filters: string[],
   ): Promise<Offer[]> {
-    console.log('🔥resolver getOffers')
+    console.log('🔥filters dans resolver getOffers', filters)
     // const authorizationHeader = context.req.headers.authorization
     // const token = authorizationHeader.split(' ')[1] // extract the token from the header
     // // console.log('token dans le header', token)
@@ -35,12 +35,14 @@ export class GetOffersResolver {
     // console.log('foundUser', foundUser)
 
     try {
+      const where = filters?.length
+        ? { OR: filters.map((filter) => ({ category: { contains: filter } })) }
+        : {}
       const foundOffers = await this.prisma.offer.findMany({
-        orderBy: [
-          {
-            updatedAt: 'desc',
-          },
-        ],
+        where,
+        orderBy: {
+          updatedAt: 'desc',
+        },
       })
       //   console.log('foundOffers', foundOffers)
 
