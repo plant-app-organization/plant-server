@@ -16,27 +16,33 @@ export class GetOffersResolver {
     // @Args('newOfferInput') offerInput: OfferInput,
   ): Promise<Offer[]> {
     console.log('🔥resolver getOffers')
-    // const authorizationHeader = context.req.headers.authorization
-    // const token = authorizationHeader.split(' ')[1] // extract the token from the header
-    // // console.log('token dans le header', token)
+    const authorizationHeader = context.req.headers.authorization
+    const token = authorizationHeader.split(' ')[1] // extract the token from the header
+    // console.log('token dans le header', token)
 
-    // const client = await clerk.clients.verifyClient(token)
-    // console.log('client', client)
-    // console.log('userId', client.sessions[0].userId)
-    // const user = await clerk.users.getUser(client.sessions[0].userId)
-    // console.log('🪴user', user)
+    const client = await clerk.clients.verifyClient(token)
+    console.log('client', client)
+    console.log('userId', client.sessions[0].userId)
+    const user = await clerk.users.getUser(client.sessions[0].userId)
+    console.log('🪴user', user)
 
-    // const foundUser = await this.prisma.user.findUnique({
-    //   where: {
-    //     clerkId: client.sessions[0].userId,
-    //   },
-    // })
+    const foundUser = await this.prisma.user.findUnique({
+      where: {
+        clerkId: client.sessions[0].userId,
+      },
+    })
 
-    // console.log('foundUser', foundUser)
+    console.log('foundUser', foundUser)
 
     try {
-      const foundOffers = await this.prisma.offer.findMany()
-      console.log('foundOffers', foundOffers)
+      const foundOffers = await this.prisma.offer.findMany({
+        orderBy: [
+          {
+            updatedAt: 'desc',
+          },
+        ],
+      })
+      //   console.log('foundOffers', foundOffers)
 
       return foundOffers
     } catch (error) {
