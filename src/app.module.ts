@@ -9,6 +9,7 @@ import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo'
 import { AuthResolver } from './resolvers/auth.resolver'
 import { NewOfferResolver } from './resolvers/newOffer.resolver'
 import { GetOffersResolver } from './resolvers/offers.resolver'
+import { GetUserDataByIdResolver } from './resolvers/getUserDataById.resolver'
 //comments
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { GetOffersResolver } from './resolvers/offers.resolver'
     AuthResolver,
     NewOfferResolver,
     GetOffersResolver,
+    GetUserDataByIdResolver,
   ],
 })
 export class AppModule {

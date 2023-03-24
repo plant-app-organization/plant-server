@@ -11,5 +11,14 @@ export class RegisterInput {
   userName: string
 
   @Field()
+  avatar: string
+
+  @Field()
+  userBio: string
+
+  @Field()
+  isPro: boolean
+
+  @Field()
   clerkId: string
 }

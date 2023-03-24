@@ -12,7 +12,7 @@ export class AuthResolver {
     @Context() context,
     @Args('newUserInput') registerInput: RegisterInput,
   ): Promise<string> {
-    // console.log('🔥registerInput dans le resolver register', registerInput)
+    console.log('🔥registerInput dans le resolver register', registerInput)
     // console.log('💎token dans les headers', context.req.headers.authorization.split(' ')[1])
     // const authorizationHeader = context.req.headers.authorization
     // const token = authorizationHeader.split(' ')[1] // extract the token from the header

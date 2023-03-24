@@ -24,11 +24,30 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type UserModel {
+  id: ID!
+  userName: String!
+  email: String!
+  clerkId: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+  phoneNumber: String!
+  userBio: String!
+  avatar: String!
+  isPro: Boolean!
+  isActive: Boolean!
+  offerIds: [String!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   hello: String!
 
   """Get List of Offers"""
   OffersList(filters: [String!]!): [Offer!]!
+  userDataById(userId: String!): UserModel!
 }
 
 type Mutation {
@@ -39,6 +58,9 @@ type Mutation {
 input RegisterInput {
   email: String!
   userName: String!
+  avatar: String!
+  userBio: String!
+  isPro: Boolean!
   clerkId: String!
 }
 
