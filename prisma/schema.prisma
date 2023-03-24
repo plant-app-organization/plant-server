@@ -49,6 +49,8 @@ model Offer {
   isActive Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  plantHeight Int 
+  maintenanceDifficultyLevel String
   // order     Order  @relation("orderPayments", fields: [orderId], references: [id])
 //   orderId   String   @db.ObjectId
 

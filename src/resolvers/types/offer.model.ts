@@ -30,6 +30,12 @@ export class Offer implements OfferClient {
   @Field(() => Boolean)
   pot: boolean
 
+  @Field(() => Int)
+  plantHeight: number
+
+  @Field(() => String)
+  maintenanceDifficultyLevel: string
+
   @Field(() => Boolean)
   isActive: boolean
 

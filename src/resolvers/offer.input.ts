@@ -21,5 +21,11 @@ export class OfferInput {
   health: string
 
   @Field()
+  maintenanceDifficultyLevel: string
+
+  @Field()
   pot: boolean
+
+  @Field()
+  plantHeight: number
 }

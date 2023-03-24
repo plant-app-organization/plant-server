@@ -12,6 +12,8 @@ type Offer {
   category: String!
   health: String!
   pot: Boolean!
+  plantHeight: Int!
+  maintenanceDifficultyLevel: String!
   isActive: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -47,5 +49,7 @@ input OfferInput {
   description: String!
   category: String!
   health: String!
+  maintenanceDifficultyLevel: String!
   pot: Boolean!
+  plantHeight: Float!
 }
