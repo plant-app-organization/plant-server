@@ -22,10 +22,10 @@ export class AuthResolver {
 
     // create user in DB
 
-    const result = await this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: registerInput,
     })
-    console.log('result', result)
+    console.log('result', user)
 
     return 'user enregistré'
   }
