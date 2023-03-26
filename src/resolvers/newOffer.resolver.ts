@@ -3,6 +3,10 @@ import { PrismaService } from '../prisma.service'
 import { OfferInput } from './offer.input'
 import { User } from '@prisma/client'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
+import * as sgMail from '@sendgrid/mail'
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+
 //comment
 @Resolver()
 export class NewOfferResolver {
@@ -48,6 +52,26 @@ export class NewOfferResolver {
       })
       console.log('updateUser', updateUser)
 
+      const msg = {
+        //extract the email details
+        to: foundUser.email,
+        from: process.env.SENDGRID_EMAIL_SENDER,
+        templateId: 'd-6512303bbdbb4ae88d9ba2b47b787c66',
+        //extract the custom fields
+        dynamic_template_data: {
+          plantName: newOffer.plantName,
+          price: newOffer.price,
+          picture: newOffer.pictures[0],
+        },
+      }
+      sgMail
+        .send(msg)
+        .then(() => {
+          console.log('📨 Email de confirmation envoyé')
+        })
+        .catch((error) => {
+          console.error(error.response.body)
+        })
       return !!newOffer
     } catch (error) {
       // If an error occurred, return false
@@ -55,4 +79,3 @@ export class NewOfferResolver {
     }
   }
 }
-
