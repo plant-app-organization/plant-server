@@ -13,9 +13,9 @@ generator client {
 model User {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
   email          String        @unique
-  clerkId        String       @unique
+  clerkId        String        @unique
   firstName      String?
-  userName      String
+  userName       String
   lastName       String?
   password       String?
   phoneNumber    String?
@@ -27,33 +27,35 @@ model User {
   ordersAsBuyer  Order[]       @relation("buyerRelation")
   offers         Offer[]
   offerIds       String[]      @db.ObjectId
-  isActive  Boolean?
+  isActive       Boolean?
   isPro          Boolean?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  bookmarks      String[]      @db.ObjectId
 
   @@map("users")
 }
 
 model Offer {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  author      User     @relation(fields: [authorId], references: [id])
-  authorId    String   @db.ObjectId
-  plantName String   
-  pictures  String[]
-  description String
-  price     Int
-  health String
-  category String
-  pot Boolean
-  isActive Boolean @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  plantHeight Int 
+  id                         String   @id @default(auto()) @map("_id") @db.ObjectId
+  author                     User     @relation(fields: [authorId], references: [id])
+  authorId                   String   @db.ObjectId
+  plantName                  String
+  pictures                   String[]
+  description                String
+  price                      Int
+  health                     String
+  category                   String
+  pot                        Boolean
+  isActive                   Boolean  @default(true)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+  plantHeight                Int
   maintenanceDifficultyLevel String
-  // order     Order  @relation("orderPayments", fields: [orderId], references: [id])
-//   orderId   String   @db.ObjectId
+  bookmarkedBy               String[] @db.ObjectId
 
+  // order     Order  @relation("orderPayments", fields: [orderId], references: [id])
+  //   orderId   String   @db.ObjectId
   @@map("offers")
 }
 

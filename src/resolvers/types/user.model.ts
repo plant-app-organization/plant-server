@@ -42,6 +42,9 @@ export class UserModel implements UserClient {
   @Field(() => [String])
   offerIds: string[]
 
+  @Field(() => [String])
+  bookmarks: string[]
+
   @Field(() => Date)
   createdAt: Date
 

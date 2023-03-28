@@ -18,6 +18,9 @@ export class Offer implements OfferClient {
   @Field(() => [String])
   pictures: string[]
 
+  @Field(() => [String])
+  bookmarkedBy: string[]
+
   @Field(() => String)
   description: string
 
@@ -29,6 +32,9 @@ export class Offer implements OfferClient {
 
   @Field(() => Boolean)
   pot: boolean
+
+  @Field(() => Boolean, { nullable: true })
+  isBookmarked?: boolean
 
   @Field(() => Int)
   plantHeight: number
