@@ -2,25 +2,86 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Offer {
+  id: ID!
+  authorId: String!
+  price: Int!
+  plantName: String!
+  pictures: [String!]!
+  bookmarkedBy: [String!]!
+  description: String!
+  category: String!
+  health: String!
+  pot: Boolean!
+  isBookmarked: Boolean
+  plantHeight: Int!
+  maintenanceDifficultyLevel: String!
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type UserModel {
+  id: ID!
+  userName: String!
+  email: String!
+  clerkId: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+  phoneNumber: String!
+  userBio: String!
+  avatar: String!
+  isPro: Boolean!
+  isActive: Boolean!
+  offerIds: [String!]!
+  bookmarks: [String!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   hello: String!
+
+  """Get List of Offers"""
+  OffersList(filters: [String!]!): [Offer!]!
+
+  """Get List of Offers Searched"""
+  OffersListSearch(searchInput: String!, filters: [String!]!): [Offer!]!
+  userDataById(userId: String!): UserModel!
+  getBookmarksByUserId(offerId: String!): String!
+  userBookmarks: [Offer!]!
+  userData: UserModel!
 }
 
 type Mutation {
-  register(registerInput: RegisterInput!): String!
+  register(newUserInput: RegisterInput!): String!
   createNewOffer(newOfferInput: OfferInput!): String!
+  bookmarkOffer(offerId: String!): String!
 }
 
 input RegisterInput {
   email: String!
-  password: String!
-  birthYear: Float!
-  firstName: String!
-  lastName: String!
+  userName: String!
+  avatar: String!
+  userBio: String!
+  isPro: Boolean!
+  clerkId: String!
 }
 
 input OfferInput {
   price: Float!
   plantName: String!
-  pictureUrl: String!
+  pictures: [String!]!
+  description: String!
+  category: String!
+  health: String!
+  maintenanceDifficultyLevel: String!
+  pot: Boolean!
+  plantHeight: Float!
 }
