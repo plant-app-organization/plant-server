@@ -54,6 +54,9 @@ type Query {
   """Get List of Offers Searched"""
   OffersListSearch(searchInput: String!, filters: [String!]!): [Offer!]!
   userDataById(userId: String!): UserModel!
+  getBookmarksByUserId(offerId: String!): String!
+  userBookmarks: [Offer!]!
+  userData: UserModel!
 }
 
 type Mutation {
