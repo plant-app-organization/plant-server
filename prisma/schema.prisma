@@ -1,6 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
@@ -66,6 +67,7 @@ model UserAddress {
   latitude  Float
   longitude Float
   zipCode   Int
+
   owner     User     @relation(fields: [ownerId], references: [id])
   ownerId   String   @db.ObjectId // relation scalar field  (used in the `@relation` attribute above)
   createdAt DateTime @default(now())
