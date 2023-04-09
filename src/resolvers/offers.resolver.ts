@@ -143,7 +143,7 @@ export class GetOffersResolver {
             createdAt: 'desc',
           },
         })
-        // console.log('🔥foundOffers', foundOffers)
+        console.log('🔥foundOffers', foundOffers)
 
         return foundOffers
       } catch (error) {
