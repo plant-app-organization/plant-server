@@ -16,6 +16,12 @@ type Offer {
   isBookmarked: Boolean
   plantHeight: Int!
   maintenanceDifficultyLevel: String!
+  location: String!
+  city: String!
+  postcode: String!
+  region: String!
+  latitude: Float!
+  longitude: Float!
   isActive: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -81,6 +87,12 @@ input OfferInput {
   description: String!
   category: String!
   health: String!
+  city: String!
+  postcode: String!
+  region: String!
+  location: String!
+  latitude: Float!
+  longitude: Float!
   maintenanceDifficultyLevel: String!
   pot: Boolean!
   plantHeight: Float!

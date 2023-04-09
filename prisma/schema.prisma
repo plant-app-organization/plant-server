@@ -1,7 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
@@ -45,8 +44,14 @@ model Offer {
   pictures                   String[]
   description                String
   price                      Int
+  latitude                   Float
+  longitude                  Float
+  location                   String
   health                     String
   category                   String
+  city                       String
+  postcode                   String
+  region                     String
   pot                        Boolean
   isActive                   Boolean  @default(true)
   createdAt                  DateTime @default(now())
@@ -61,7 +66,7 @@ model Offer {
 }
 
 model UserAddress {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
   cityName  String
   address   String
   latitude  Float

@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType, ID } from '@nestjs/graphql'
+import { Field, Int, ObjectType, ID, Float } from '@nestjs/graphql'
 import { Offer as OfferClient } from '@prisma/client'
 
 @ObjectType()
@@ -41,6 +41,24 @@ export class Offer implements OfferClient {
 
   @Field(() => String)
   maintenanceDifficultyLevel: string
+
+  @Field(() => String)
+  location: string
+
+  @Field(() => String)
+  city: string
+
+  @Field(() => String)
+  postcode: string
+
+  @Field(() => String)
+  region: string
+
+  @Field(() => Float)
+  latitude: number
+
+  @Field(() => Float)
+  longitude: number
 
   @Field(() => Boolean)
   isActive: boolean

@@ -19,13 +19,13 @@ export class NewOfferResolver {
     console.log('🔥offerInput dans le resolver newOffer', offerInput)
     const authorizationHeader = context.req.headers.authorization
     const token = authorizationHeader.split(' ')[1] // extract the token from the header
-    console.log('token dans le header', token)
+    // console.log('token dans le header', token)
 
     const client = await clerk.clients.verifyClient(token)
-    console.log('client', client)
-    console.log('userId', client.sessions[0].userId)
+    // console.log('client', client)
+    // console.log('userId', client.sessions[0].userId)
     const user = await clerk.users.getUser(client.sessions[0].userId)
-    console.log('🪴user', user)
+    // console.log('🪴user', user)
 
     const foundUser = await this.prisma.user.findUnique({
       where: {
@@ -34,11 +34,12 @@ export class NewOfferResolver {
     })
 
     console.log('foundUser', foundUser)
+    const newOffer = await this.prisma.offer.create({
+      data: { ...offerInput, authorId: foundUser.id },
+    })
+    console.log('👉🏻newOffer', newOffer)
     try {
-      const newOffer = await this.prisma.offer.create({
-        data: { ...offerInput, authorId: foundUser.id },
-      })
-      console.log('newOffer', newOffer)
+      console.log('🤩')
 
       const updateUser = await this.prisma.user.update({
         where: {
@@ -50,7 +51,7 @@ export class NewOfferResolver {
           },
         },
       })
-      console.log('updateUser', updateUser)
+      // console.log('updateUser', updateUser)
 
       const msg = {
         //extract the email details
