@@ -21,6 +21,24 @@ export class OfferInput {
   health: string
 
   @Field()
+  city: string
+
+  @Field()
+  postcode: string
+
+  @Field()
+  region: string
+
+  @Field()
+  location: string
+
+  @Field()
+  latitude: number
+
+  @Field()
+  longitude: number
+
+  @Field()
   maintenanceDifficultyLevel: string
 
   @Field()
