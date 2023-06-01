@@ -49,6 +49,7 @@ model Offer {
   location                   String
   health                     String
   category                   String
+  environment                String
   city                       String
   postcode                   String
   region                     String

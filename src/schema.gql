@@ -11,6 +11,7 @@ type Offer {
   bookmarkedBy: [String!]!
   description: String!
   category: String!
+  environment: String!
   health: String!
   pot: Boolean!
   isBookmarked: Boolean
@@ -58,7 +59,7 @@ type Query {
   OffersList(filters: [String!]!): [Offer!]!
 
   """Get List of Offers Searched"""
-  OffersListSearch(searchInput: String!, filters: [String!]!): [Offer!]!
+  OffersListSearch(searchInput: String!, filters: [String!]!, environment: String!): [Offer!]!
   userDataById(userId: String!): UserModel!
   getBookmarksByUserId(offerId: String!): String!
   userBookmarks: [Offer!]!
@@ -86,6 +87,7 @@ input OfferInput {
   pictures: [String!]!
   description: String!
   category: String!
+  environment: String!
   health: String!
   city: String!
   postcode: String!

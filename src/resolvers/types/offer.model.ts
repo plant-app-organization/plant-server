@@ -28,6 +28,9 @@ export class Offer implements OfferClient {
   category: string
 
   @Field(() => String)
+  environment: string
+
+  @Field(() => String)
   health: string
 
   @Field(() => Boolean)

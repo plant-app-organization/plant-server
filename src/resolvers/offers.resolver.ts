@@ -27,12 +27,12 @@ export class GetOffersResolver {
           updatedAt: 'desc',
         },
       })
-      //   console.log('foundOffers', foundOffers)
+      console.log('foundOffers', foundOffers)
 
       return foundOffers
     } catch (error) {
       // If an error occurred, return false
-      throw new Error('Failed to get offers')
+      throw new Error('Failed to get offers in GetOffers')
     }
   }
 
@@ -44,6 +44,7 @@ export class GetOffersResolver {
     @Context() context,
     @Args('searchInput', { type: () => String }) searchInput: string,
     @Args('filters', { type: () => [String] }) filters: string[],
+    @Args('environment', { type: () => String }) environment: string,
   ): Promise<Offer[]> {
     console.log('🔎searchInput dans resolver getOffers', searchInput)
     console.log('🔥filters dans resolver getOffers', filters)
@@ -67,6 +68,18 @@ export class GetOffersResolver {
       console.log('foundUser', foundUser)
 
       try {
+        console.log('environment', environment)
+        const environmentValues: string[] = []
+        if (environment === '' || environment === 'indoorAndOutdoor') {
+          environmentValues.push('indoor')
+          environmentValues.push('outdoor')
+        }
+        if (environment === 'indoor') {
+          environmentValues.push('indoor')
+        }
+        if (environment === 'outdoor') {
+          environmentValues.push('outdoor')
+        }
         const foundOffers = await this.prisma.offer.findMany({
           where: {
             AND: [
@@ -91,6 +104,15 @@ export class GetOffersResolver {
                   ? filters.map((filter) => ({ category: { contains: filter } }))
                   : {},
               },
+              ,
+              {
+                isActive: true,
+              },
+              {
+                environment: {
+                  in: environmentValues,
+                },
+              },
             ],
           },
           orderBy: {
@@ -109,7 +131,7 @@ export class GetOffersResolver {
         return foundOffersWithBookmarks
       } catch (error) {
         // If an error occurred, return false
-        throw new Error('Failed to find offers')
+        throw new Error('Failed to find offers in searchOffers')
       }
     } else {
       try {
@@ -143,7 +165,7 @@ export class GetOffersResolver {
             createdAt: 'desc',
           },
         })
-        // console.log('🔥foundOffers', foundOffers)
+        console.log('🔥foundOffers', foundOffers)
 
         return foundOffers
       } catch (error) {
