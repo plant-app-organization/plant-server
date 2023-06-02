@@ -57,7 +57,7 @@ export class GetOffersResolver {
       console.log('client', client)
       console.log('userId', client.sessions[0].userId)
       const user = await clerk.users.getUser(client.sessions[0].userId)
-      // console.log('🪴user', user)
+      console.log('🪴user', user)
 
       const foundUser = await this.prisma.user.findUnique({
         where: {
