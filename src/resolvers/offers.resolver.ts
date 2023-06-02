@@ -52,6 +52,18 @@ export class GetOffersResolver {
     const authorizationHeader = context.req.headers.authorization
     const token = authorizationHeader.split(' ')[1] // extract the token from the header
     console.log('token dans le header', token)
+    console.log('environment', environment)
+    const environmentValues: string[] = []
+    if (environment === '' || environment === 'indoorAndOutdoor') {
+      environmentValues.push('indoor')
+      environmentValues.push('outdoor')
+    }
+    if (environment === 'indoor') {
+      environmentValues.push('indoor')
+    }
+    if (environment === 'outdoor') {
+      environmentValues.push('outdoor')
+    }
     if (token) {
       const client = await clerk.clients.verifyClient(token)
       console.log('client', client)
@@ -68,18 +80,6 @@ export class GetOffersResolver {
       console.log('foundUser', foundUser)
 
       try {
-        console.log('environment', environment)
-        const environmentValues: string[] = []
-        if (environment === '' || environment === 'indoorAndOutdoor') {
-          environmentValues.push('indoor')
-          environmentValues.push('outdoor')
-        }
-        if (environment === 'indoor') {
-          environmentValues.push('indoor')
-        }
-        if (environment === 'outdoor') {
-          environmentValues.push('outdoor')
-        }
         const foundOffers = await this.prisma.offer.findMany({
           where: {
             AND: [
@@ -158,6 +158,15 @@ export class GetOffersResolver {
                 OR: filters?.length
                   ? filters.map((filter) => ({ category: { contains: filter } }))
                   : {},
+              },
+              ,
+              {
+                isActive: true,
+              },
+              {
+                environment: {
+                  in: environmentValues,
+                },
               },
             ],
           },
