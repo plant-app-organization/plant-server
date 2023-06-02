@@ -54,8 +54,8 @@ export class GetOffersResolver {
     console.log('token dans le header', token)
     if (token) {
       const client = await clerk.clients.verifyClient(token)
-      // console.log('client', client)
-      // console.log('userId', client.sessions[0].userId)
+      console.log('client', client)
+      console.log('userId', client.sessions[0].userId)
       const user = await clerk.users.getUser(client.sessions[0].userId)
       // console.log('🪴user', user)
 

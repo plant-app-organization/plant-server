@@ -12,6 +12,7 @@ import { GetOffersResolver } from './resolvers/offers.resolver'
 import { GetUserDataByIdResolver } from './resolvers/getUserDataById.resolver'
 import { BookmarksResolver } from './resolvers/bookmarks.resolver'
 import { GetUserDataResolver } from './resolvers/getUserData.resolver'
+// import { GetTopPlantersResolver } from './resolvers/getTopPlanters.resolver'
 //comments
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { GetUserDataResolver } from './resolvers/getUserData.resolver'
     GetUserDataByIdResolver,
     BookmarksResolver,
     GetUserDataResolver,
+    // GetTopPlantersResolver,
   ],
 })
 export class AppModule {
