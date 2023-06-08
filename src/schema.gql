@@ -64,6 +64,9 @@ type Query {
   getBookmarksByUserId(offerId: String!): String!
   userBookmarks: [Offer!]!
   userData: UserModel!
+
+  """Get List of Users with the largest amount of active offers"""
+  UsersList: [UserModel!]!
 }
 
 type Mutation {
