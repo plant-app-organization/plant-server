@@ -1,4 +1,4 @@
-import { Query, Resolver, Args, Context } from '@nestjs/graphql'
+import { Query, Resolver, Args, Context, Int } from '@nestjs/graphql'
 import { PrismaService } from '../prisma.service'
 import { OfferInput } from './offer.input'
 import { User } from '@prisma/client'
@@ -45,16 +45,25 @@ export class GetOffersResolver {
     @Args('searchInput', { type: () => String }) searchInput: string,
     @Args('filters', { type: () => [String] }) filters: string[],
     @Args('environment', { type: () => String }) environment: string,
-    @Args('offset', { type: () => Number, defaultValue: 0 }) offset: number,
-    @Args('limit', { type: () => Number, defaultValue: 8 }) limit: number,
+    @Args('offset', { type: () => Int, defaultValue: 0 }) offset: number,
+    @Args('limit', { type: () => Int, defaultValue: 6 }) limit: number,
   ): Promise<Offer[]> {
-    console.log('🔎searchInput dans resolver getOffers', searchInput)
-    console.log('🔥filters dans resolver getOffers', filters)
+    // console.log('🔎searchInput dans resolver getOffers', searchInput)
+    // console.log('🔥filters dans resolver getOffers', filters)
     // Get the authenticated user's ID
     const authorizationHeader = context.req.headers.authorization
     const token = authorizationHeader.split(' ')[1] // extract the token from the header
-    console.log('token dans le header', token)
-    console.log('environment', environment)
+    // console.log('token dans le header', token)
+    // console.log('environment', environment)
+    console.log(
+      'new request : limit : ',
+      limit,
+      'offset : ',
+      offset,
+      filters,
+      environment,
+      searchInput,
+    )
     const environmentValues: string[] = []
     if (environment === '' || environment === 'indoorAndOutdoor') {
       environmentValues.push('indoor')
@@ -68,10 +77,10 @@ export class GetOffersResolver {
     }
     if (token) {
       const client = await clerk.clients.verifyClient(token)
-      console.log('client', client)
-      console.log('userId', client.sessions[0].userId)
+      // console.log('client', client)
+      // console.log('userId', client.sessions[0].userId)
       const user = await clerk.users.getUser(client.sessions[0].userId)
-      console.log('🪴user', user)
+      // console.log('🪴user', user)
 
       const foundUser = await this.prisma.user.findUnique({
         where: {
@@ -79,7 +88,7 @@ export class GetOffersResolver {
         },
       })
 
-      console.log('foundUser', foundUser)
+      // console.log('foundUser', foundUser)
 
       try {
         const foundOffers = await this.prisma.offer.findMany({
@@ -123,7 +132,7 @@ export class GetOffersResolver {
           skip: offset,
           take: limit,
         })
-        // console.log('🔥foundOffers', foundOffers)
+        console.log('🔥foundOffers.length', foundOffers.length)
 
         const bookmarkedOffers = foundUser.bookmarks
 
