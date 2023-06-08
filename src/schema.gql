@@ -59,7 +59,7 @@ type Query {
   OffersList(filters: [String!]!): [Offer!]!
 
   """Get List of Offers Searched"""
-  OffersListSearch(searchInput: String!, filters: [String!]!, environment: String!): [Offer!]!
+  OffersListSearch(searchInput: String!, filters: [String!]!, environment: String!, offset: Float! = 0, limit: Float! = 8): [Offer!]!
   userDataById(userId: String!): UserModel!
   getBookmarksByUserId(offerId: String!): String!
   userBookmarks: [Offer!]!

@@ -45,6 +45,8 @@ export class GetOffersResolver {
     @Args('searchInput', { type: () => String }) searchInput: string,
     @Args('filters', { type: () => [String] }) filters: string[],
     @Args('environment', { type: () => String }) environment: string,
+    @Args('offset', { type: () => Number, defaultValue: 0 }) offset: number,
+    @Args('limit', { type: () => Number, defaultValue: 8 }) limit: number,
   ): Promise<Offer[]> {
     console.log('🔎searchInput dans resolver getOffers', searchInput)
     console.log('🔥filters dans resolver getOffers', filters)
@@ -118,6 +120,8 @@ export class GetOffersResolver {
           orderBy: {
             createdAt: 'desc',
           },
+          skip: offset,
+          take: limit,
         })
         // console.log('🔥foundOffers', foundOffers)
 
@@ -173,6 +177,8 @@ export class GetOffersResolver {
           orderBy: {
             createdAt: 'desc',
           },
+          skip: offset,
+          take: limit,
         })
         console.log('🔥foundOffers', foundOffers)
 
