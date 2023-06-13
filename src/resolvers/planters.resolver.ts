@@ -34,7 +34,7 @@ export class GetPlantersResolver {
       const sortedUsers = usersWithOffers
         .sort((a, b) => b.offerIds.length - a.offerIds.length)
         .slice(0, 8)
-      console.log('sortedUsers', sortedUsers)
+      // console.log('sortedUsers', sortedUsers)
       return sortedUsers
     } catch (error) {
       // If an error occurred, return false

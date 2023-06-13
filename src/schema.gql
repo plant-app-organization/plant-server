@@ -52,6 +52,13 @@ type UserModel {
   updatedAt: DateTime!
 }
 
+type SuggestionModel {
+  id: ID!
+  title: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   hello: String!
 
@@ -59,7 +66,7 @@ type Query {
   OffersList(filters: [String!]!): [Offer!]!
 
   """Get List of Offers Searched"""
-  OffersListSearch(searchInput: String!, filters: [String!]!, environment: String!, offset: Int! = 0, limit: Int! = 6): [Offer!]!
+  OffersListSearch(searchInput: String!, filters: [String!]!, environment: String!, offset: Int! = 0, limit: Int! = 10): [Offer!]!
   userDataById(userId: String!): UserModel!
   getBookmarksByUserId(offerId: String!): String!
   userBookmarks: [Offer!]!
@@ -67,6 +74,9 @@ type Query {
 
   """Get List of Users with the largest amount of active offers"""
   UsersList: [UserModel!]!
+
+  """Get List of Suggestions"""
+  SuggestionsList: [SuggestionModel!]!
 }
 
 type Mutation {

@@ -46,7 +46,7 @@ export class GetOffersResolver {
     @Args('filters', { type: () => [String] }) filters: string[],
     @Args('environment', { type: () => String }) environment: string,
     @Args('offset', { type: () => Int, defaultValue: 0 }) offset: number,
-    @Args('limit', { type: () => Int, defaultValue: 6 }) limit: number,
+    @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
   ): Promise<Offer[]> {
     // console.log('🔎searchInput dans resolver getOffers', searchInput)
     // console.log('🔥filters dans resolver getOffers', filters)
@@ -132,7 +132,7 @@ export class GetOffersResolver {
           skip: offset,
           take: limit,
         })
-        console.log('🔥foundOffers.length', foundOffers.length)
+        console.log('🔥foundOffers.length', foundOffers)
 
         const bookmarkedOffers = foundUser.bookmarks
 
