@@ -77,6 +77,9 @@ type Query {
 
   """Get List of Suggestions"""
   SuggestionsList: [SuggestionModel!]!
+
+  """Get List of Offers and data By Ids"""
+  OffersListByIds(offerIds: [String!]!): [Offer!]!
 }
 
 type Mutation {
