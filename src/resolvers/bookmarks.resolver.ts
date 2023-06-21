@@ -239,10 +239,10 @@ export class BookmarksResolver {
     console.log('token dans le header', token)
 
     const client = await clerk.clients.verifyClient(token)
-    // console.log('client', client)
-    // console.log('userId', client.sessions[0].userId)
+    console.log('client', client)
+    console.log('userId', client.sessions[0].userId)
     const user = await clerk.users.getUser(client.sessions[0].userId)
-    // console.log('🪴user', user)
+    console.log('🪴user', user)
 
     const foundUser = await this.prisma.user.findUnique({
       where: {

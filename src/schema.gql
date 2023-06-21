@@ -48,6 +48,7 @@ type UserModel {
   isActive: Boolean!
   offerIds: [String!]!
   bookmarks: [String!]!
+  conversations: [String!]!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -55,6 +56,16 @@ type UserModel {
 type SuggestionModel {
   id: ID!
   title: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type MessageModel {
+  id: ID!
+  senderId: String!
+  conversationId: String!
+  text: String!
+  isActive: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -80,12 +91,16 @@ type Query {
 
   """Get List of Offers and data By Ids"""
   OffersListByIds(offerIds: [String!]!): [Offer!]!
+
+  """Get List of Messages for a given conversation"""
+  MessagesList(conversationId: String!): [MessageModel!]!
 }
 
 type Mutation {
   register(newUserInput: RegisterInput!): String!
   createNewOffer(newOfferInput: OfferInput!): String!
   bookmarkOffer(offerId: String!): String!
+  sendMessage(newMessageInput: MessageInput!): String!
 }
 
 input RegisterInput {
@@ -114,4 +129,9 @@ input OfferInput {
   maintenanceDifficultyLevel: String!
   pot: Boolean!
   plantHeight: Float!
+}
+
+input MessageInput {
+  offerId: String!
+  text: String!
 }
