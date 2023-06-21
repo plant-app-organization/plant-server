@@ -45,6 +45,9 @@ export class UserModel implements UserClient {
   @Field(() => [String])
   bookmarks: string[]
 
+  @Field(() => [String])
+  conversations: string[]
+
   @Field(() => Date)
   createdAt: Date
 

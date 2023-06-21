@@ -32,14 +32,17 @@ model User {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   bookmarks      String[]      @db.ObjectId
+  conversations  String[]      @db.ObjectId
+  messages       Message[]
 
   @@map("users")
 }
 
 model Offer {
-  id                         String   @id @default(auto()) @map("_id") @db.ObjectId
-  author                     User     @relation(fields: [authorId], references: [id])
-  authorId                   String   @db.ObjectId
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String @db.ObjectId
+
   plantName                  String
   pictures                   String[]
   description                String
@@ -54,12 +57,13 @@ model Offer {
   postcode                   String
   region                     String
   pot                        Boolean
-  isActive                   Boolean  @default(true)
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
+  isActive                   Boolean        @default(true)
+  createdAt                  DateTime       @default(now())
+  updatedAt                  DateTime       @updatedAt
   plantHeight                Int
   maintenanceDifficultyLevel String
-  bookmarkedBy               String[] @db.ObjectId
+  bookmarkedBy               String[]       @db.ObjectId
+  conversations              Conversation[]
 
   // order     Order  @relation("orderPayments", fields: [orderId], references: [id])
   //   orderId   String   @db.ObjectId
@@ -145,6 +149,29 @@ model Suggestion {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-    @@map("suggestions")
+  @@map("suggestions")
+}
 
+model Conversation {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  offer          Offer     @relation(fields: [offerId], references: [id])
+  offerId        String    @db.ObjectId
+  participantIds String[]  @db.ObjectId
+  messages       Message[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String       @db.ObjectId
+  sender         User         @relation(fields: [senderId], references: [id])
+  senderId       String       @db.ObjectId
+  text           String
+  createdAt      DateTime     @default(now())
+
+  @@map("messages")
 }

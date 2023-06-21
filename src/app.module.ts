@@ -15,7 +15,8 @@ import { GetUserDataResolver } from './resolvers/getUserData.resolver'
 import { GetPlantersResolver } from './resolvers/planters.resolver'
 import { GetSuggestionsResolver } from './resolvers/suggestions.resolver'
 import { GetOffersDataByIdsResolver } from './resolvers/getOffersDataByIds.resolver'
-//comments
+import { MessagesResolver } from './resolvers/messages.resolver'
+
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -40,6 +41,7 @@ import { GetOffersDataByIdsResolver } from './resolvers/getOffersDataByIds.resol
     GetPlantersResolver,
     GetSuggestionsResolver,
     GetOffersDataByIdsResolver,
+    MessagesResolver,
   ],
 })
 export class AppModule {
