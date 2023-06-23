@@ -70,6 +70,17 @@ type MessageModel {
   updatedAt: DateTime!
 }
 
+type ConversationModel {
+  id: ID!
+  participantIds: String!
+  participants: [UserModel!]!
+  offerId: String!
+  offer: Offer!
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   hello: String!
 
@@ -94,6 +105,10 @@ type Query {
 
   """Get List of Messages for a given conversation"""
   MessagesList(conversationId: String!): [MessageModel!]!
+  getIsConversationExisting(userId1: String!, offerId: String!): String!
+
+  """Get all conversations of the authenticated user"""
+  UserConversations: [ConversationModel!]!
 }
 
 type Mutation {
