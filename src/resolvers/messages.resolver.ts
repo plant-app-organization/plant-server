@@ -1,9 +1,10 @@
 import { Resolver, Mutation, Args, Context, Query } from '@nestjs/graphql'
-import { Message } from '@prisma/client'
+import { Message, Conversation } from '@prisma/client'
 import { MessageInput } from './message.input'
 import { PrismaService } from '../prisma.service'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
 import { MessageModel } from './types/message.model'
+import { ConversationModel } from './types/conversation.model'
 
 @Resolver()
 export class MessagesResolver {
@@ -100,5 +101,127 @@ export class MessagesResolver {
     })
     console.log('conversatIONData', conversationData)
     return conversationData
+  }
+
+  // check if conversation is already created between two users about   an offer
+  @Query(() => String)
+  async getIsConversationExisting(
+    @Context() context,
+    @Args('userId1') userId1: string,
+    @Args('offerId') offerId: string,
+  ): Promise<string> {
+    console.log('Data in getIsConversationExisting', 'userId1', userId1, 'offerId', offerId)
+
+    const authorizationHeader = context.req.headers.authorization
+    const token = authorizationHeader.split(' ')[1] // extract the token from the header
+    const client = await clerk.clients.verifyClient(token)
+    const foundUser = await this.prisma.user.findUnique({
+      where: {
+        clerkId: client.sessions[0].userId,
+      },
+    })
+    console.log('foundUser in sendMessage()', foundUser)
+
+    if (foundUser) {
+      const foundConversation = await this.prisma.conversation.findFirst({
+        where: {
+          AND: [
+            {
+              participantIds: { has: userId1 },
+            },
+            {
+              participantIds: { has: foundUser.id },
+            },
+            {
+              offerId: offerId,
+            },
+          ],
+        },
+      })
+
+      console.log('☀️foundConversation', foundConversation)
+
+      return foundConversation ? foundConversation.id : null
+    } else {
+      throw new Error('Access denied')
+    }
+  }
+
+  @Query(() => [ConversationModel], {
+    name: 'UserConversations',
+    description: 'Get all conversations of the authenticated user',
+  })
+  async getUserConversations(@Context() context): Promise<any> {
+    const authorizationHeader = context.req.headers.authorization
+    const token = authorizationHeader.split(' ')[1] // extract the token from the header
+    const client = await clerk.clients.verifyClient(token)
+    const foundUser = await this.prisma.user.findUnique({
+      where: {
+        clerkId: client.sessions[0].userId,
+      },
+    })
+
+    if (foundUser) {
+      const userConversations = await this.prisma.conversation.findMany({
+        where: {
+          participantIds: {
+            has: foundUser.id,
+          },
+        },
+        include: {
+          offer: {
+            select: {
+              authorId: true,
+              category: true,
+              createdAt: true,
+              description: true,
+              health: true,
+              id: true,
+              isActive: true,
+              maintenanceDifficultyLevel: true,
+              pictures: true,
+              plantHeight: true,
+              plantName: true,
+              environment: true,
+              latitude: true,
+              longitude: true,
+              pot: true,
+              price: true,
+              updatedAt: true,
+              city: true,
+            },
+          },
+        },
+      })
+
+      // Fetch participant details for each conversation
+      const populatedConversations = await Promise.all(
+        userConversations.map(async (conversation) => {
+          const participants = (
+            await this.prisma.user.findMany({
+              where: {
+                id: {
+                  in: conversation.participantIds,
+                },
+              },
+              select: {
+                userName: true,
+                avatar: true,
+                id: true,
+              },
+            })
+          ).filter((participant) => participant.id !== foundUser.id)
+
+          return {
+            ...conversation,
+            participants,
+          }
+        }),
+      )
+      console.log('=>', populatedConversations)
+      return populatedConversations
+    } else {
+      throw new Error('Access denied')
+    }
   }
 }
