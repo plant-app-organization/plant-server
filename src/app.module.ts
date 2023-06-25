@@ -25,6 +25,7 @@ import { MessagesResolver } from './resolvers/messages.resolver'
       debug: false,
       playground: true,
       introspection: true,
+      installSubscriptionHandlers: true,
     }),
   ],
   controllers: [AppController],

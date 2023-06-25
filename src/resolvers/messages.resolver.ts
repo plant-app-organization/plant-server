@@ -1,10 +1,13 @@
-import { Resolver, Mutation, Args, Context, Query } from '@nestjs/graphql'
-import { Message, Conversation } from '@prisma/client'
+import { Resolver, Mutation, Args, Context, Query, Subscription } from '@nestjs/graphql'
+import { Message } from '@prisma/client'
 import { MessageInput } from './message.input'
 import { PrismaService } from '../prisma.service'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
 import { MessageModel } from './types/message.model'
 import { ConversationModel } from './types/conversation.model'
+import { PubSub } from 'graphql-subscriptions'
+
+const pubSub = new PubSub()
 
 @Resolver()
 export class MessagesResolver {
@@ -78,29 +81,12 @@ export class MessagesResolver {
       })
 
       console.log('👉🏻newMessage created in DB ', newMessage)
+      await pubSub.publish(`messageAdded.${conversation.id}`, { messageAdded: newMessage })
 
       return true
     }
 
     throw new Error('User not found or not authorized')
-  }
-
-  @Query((returns) => [MessageModel], {
-    name: 'MessagesList',
-    description: 'Get List of Messages for a given conversation',
-  })
-  async getConversationMessages(
-    @Args('conversationId') conversationId: string,
-  ): Promise<Message[]> {
-    console.log('conversationId in getConversationMessages', conversationId)
-    const conversationData = await this.prisma.message.findMany({
-      where: { conversationId },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-    console.log('conversatIONData', conversationData)
-    return conversationData
   }
 
   // check if conversation is already created between two users about   an offer
@@ -223,5 +209,33 @@ export class MessagesResolver {
     } else {
       throw new Error('Access denied')
     }
+  }
+
+  @Query((returns) => [MessageModel], {
+    name: 'MessagesList',
+    description: 'Get List of Messages for a given conversation',
+  })
+  async getConversationMessages(
+    @Args('conversationId') conversationId: string,
+  ): Promise<Message[]> {
+    console.log('conversationId in getConversationMessages', conversationId)
+    const conversationData = await this.prisma.message.findMany({
+      where: { conversationId },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+    console.log('conversatIONData', conversationData)
+    return conversationData
+  }
+
+  @Subscription(() => MessageModel, {
+    name: 'messageAdded',
+    filter: (payload, variables) =>
+      payload.messageAdded.conversationId === variables.conversationId,
+  })
+  messageAdded(@Args('conversationId', { type: () => String }) conversationId: string) {
+    console.log('New message published')
+    return pubSub.asyncIterator(`messageAdded.${conversationId}`)
   }
 }
