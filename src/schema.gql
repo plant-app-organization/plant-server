@@ -102,13 +102,13 @@ type Query {
 
   """Get List of Offers and data By Ids"""
   OffersListByIds(offerIds: [String!]!): [Offer!]!
-
-  """Get List of Messages for a given conversation"""
-  MessagesList(conversationId: String!): [MessageModel!]!
   getIsConversationExisting(userId1: String!, offerId: String!): String!
 
   """Get all conversations of the authenticated user"""
   UserConversations: [ConversationModel!]!
+
+  """Get List of Messages for a given conversation"""
+  MessagesList(conversationId: String!): [MessageModel!]!
 }
 
 type Mutation {
@@ -149,4 +149,8 @@ input OfferInput {
 input MessageInput {
   offerId: String!
   text: String!
+}
+
+type Subscription {
+  messageAdded(conversationId: String!): MessageModel!
 }
