@@ -1,16 +1,22 @@
-import { Mutation, Resolver, Args, Context } from '@nestjs/graphql'
+import { Mutation, Resolver, Args, Context, Subscription } from '@nestjs/graphql'
+import { PubSub } from 'graphql-subscriptions'
 import { PrismaService } from '../prisma.service'
 import { OfferInput } from './offer.input'
-import { User } from '@prisma/client'
+import { User, Offer } from '@prisma/client'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
 import * as sgMail from '@sendgrid/mail'
+import { Subscriber } from 'rxjs'
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 //comment
 @Resolver()
 export class NewOfferResolver {
-  constructor(private prisma: PrismaService) {}
+  private pubSub: PubSub
+  constructor(private prisma: PrismaService) {
+    this.pubSub = new PubSub()
+  }
+
   @Mutation(() => String)
   async createNewOffer(
     @Context() context,
@@ -65,6 +71,8 @@ export class NewOfferResolver {
           picture: newOffer.pictures[0],
         },
       }
+      this.pubSub.publish('offerAdded', { offerAdded: newOffer })
+
       sgMail
         .send(msg)
         .then(() => {

@@ -25,6 +25,10 @@ import { MessagesResolver } from './resolvers/messages.resolver'
       debug: false,
       playground: true,
       introspection: true,
+      subscriptions: {
+        'graphql-ws': true,
+        'subscriptions-transport-ws': true,
+      },
       installSubscriptionHandlers: true,
     }),
   ],
