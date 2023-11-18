@@ -14,7 +14,7 @@ export class BookmarksResolver {
     // Get the authenticated user's ID
     const authorizationHeader = context.req.headers.authorization
     const token = authorizationHeader.split(' ')[1] // extract the token from the header
-    console.log('token dans le header', token)
+    console.log('🥵token dans le header', token)
 
     const client = await clerk.clients.verifyClient(token)
     // console.log('client', client)

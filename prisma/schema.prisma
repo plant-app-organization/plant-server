@@ -43,7 +43,7 @@ model Offer {
   plantName                  String
   pictures                   String[]
   description                String
-  price                      Int
+  price                      Float
   latitude                   Float
   longitude                  Float
   location                   String

@@ -21,6 +21,10 @@ import { GetUserDataResolver } from './resolvers/getUserData.resolver'
       debug: false,
       playground: true,
       introspection: true,
+      subscriptions: {
+        'graphql-ws': true,
+        'subscriptions-transport-ws': true,
+      },
     }),
   ],
   controllers: [AppController],
