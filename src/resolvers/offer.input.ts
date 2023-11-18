@@ -18,6 +18,9 @@ export class OfferInput {
   category: string
 
   @Field()
+  environment: string
+
+  @Field()
   health: string
 
   @Field()

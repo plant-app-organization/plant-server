@@ -12,7 +12,11 @@ import { GetOffersResolver } from './resolvers/offers.resolver'
 import { GetUserDataByIdResolver } from './resolvers/getUserDataById.resolver'
 import { BookmarksResolver } from './resolvers/bookmarks.resolver'
 import { GetUserDataResolver } from './resolvers/getUserData.resolver'
-//comments
+import { GetPlantersResolver } from './resolvers/planters.resolver'
+import { GetSuggestionsResolver } from './resolvers/suggestions.resolver'
+import { GetOffersDataByIdsResolver } from './resolvers/getOffersDataByIds.resolver'
+import { MessagesResolver } from './resolvers/messages.resolver'
+
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -25,6 +29,7 @@ import { GetUserDataResolver } from './resolvers/getUserData.resolver'
         'graphql-ws': true,
         'subscriptions-transport-ws': true,
       },
+      installSubscriptionHandlers: true,
     }),
   ],
   controllers: [AppController],
@@ -38,6 +43,10 @@ import { GetUserDataResolver } from './resolvers/getUserData.resolver'
     GetUserDataByIdResolver,
     BookmarksResolver,
     GetUserDataResolver,
+    GetPlantersResolver,
+    GetSuggestionsResolver,
+    GetOffersDataByIdsResolver,
+    MessagesResolver,
   ],
 })
 export class AppModule {
