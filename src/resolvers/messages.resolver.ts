@@ -17,7 +17,7 @@ export class MessagesResolver {
   async sendMessage(
     @Context() context,
     @Args('newMessageInput') messageInput: MessageInput,
-  ): Promise<boolean> {
+  ): Promise<any> {
     console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥messageInput in sendMessage resolver', messageInput)
     const authorizationHeader = context.req.headers.authorization
     const token = authorizationHeader.split(' ')[1] // extract the token from the header
@@ -83,7 +83,7 @@ export class MessagesResolver {
       console.log('👉🏻newMessage created in DB ', newMessage)
       await pubSub.publish(`messageAdded.${conversation.id}`, { messageAdded: newMessage })
 
-      return true
+      return { result: true, newConversationId: conversation.id }
     }
 
     throw new Error('User not found or not authorized')
