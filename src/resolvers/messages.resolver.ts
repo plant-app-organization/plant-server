@@ -21,7 +21,7 @@ export class MessagesResolver {
     @Context() context,
     @Args('newMessageInput') messageInput: MessageInput,
   ): Promise<SendMessageResponse> {
-    console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥messageInput in sendMessage resolver', messageInput)
+    // console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥messageInput in sendMessage resolver', messageInput)
     const authorizationHeader = context.req.headers.authorization
     const token = authorizationHeader.split(' ')[1] // extract the token from the header
     const client = await clerk.clients.verifyClient(token)
@@ -30,7 +30,7 @@ export class MessagesResolver {
         clerkId: client.sessions[0].userId,
       },
     })
-    console.log('foundUser in sendMessage()', foundUser)
+    // console.log('foundUser in sendMessage()', foundUser)
 
     if (foundUser) {
       // get the receiverId from the offerId
@@ -59,11 +59,11 @@ export class MessagesResolver {
         },
       })
 
-      console.log('found conversation :', conversation)
+      // console.log('found conversation :', conversation)
 
       // if no conversation exists, create new conversation
       if (!conversation) {
-        console.log('conversation didnt exist')
+        // console.log('conversation didnt exist')
         conversation = await this.prisma.conversation.create({
           data: {
             offerId: messageInput.offerId,
@@ -71,7 +71,7 @@ export class MessagesResolver {
           },
         })
 
-        console.log('👉🏻new Conversation created in DB ')
+        // console.log('👉🏻new Conversation created in DB ')
       }
 
       // Create new message document in DB
@@ -83,7 +83,7 @@ export class MessagesResolver {
         },
       })
 
-      console.log('👉🏻newMessage created in DB ', newMessage)
+      // console.log('👉🏻newMessage created in DB ', newMessage)
       await pubSub.publish(`messageAdded.${conversation.id}`, { messageAdded: newMessage })
 
       const receiverUser = await this.prisma.user.findUnique({
@@ -91,6 +91,7 @@ export class MessagesResolver {
           id: receiverId,
         },
       })
+      console.log('🔥receiverUser', receiverUser)
 
       const msg = {
         //extract the email details
