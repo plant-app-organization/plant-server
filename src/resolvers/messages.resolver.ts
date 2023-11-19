@@ -85,9 +85,15 @@ export class MessagesResolver {
 
       console.log('👉🏻newMessage created in DB ', newMessage)
       await pubSub.publish(`messageAdded.${conversation.id}`, { messageAdded: newMessage })
+
+      const receiverUser = await this.prisma.user.findUnique({
+        where: {
+          id: receiverId,
+        },
+      })
       const msg = {
         //extract the email details
-        to: foundUser.email,
+        to: receiverUser.email,
         from: process.env.SENDGRID_EMAIL_SENDER,
         templateId: 'd-6512303bbdbb4ae88d9ba2b47b787c66',
         //extract the custom fields
