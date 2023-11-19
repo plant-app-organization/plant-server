@@ -70,6 +70,11 @@ type MessageModel {
   updatedAt: DateTime!
 }
 
+type SendMessageResponse {
+  result: Boolean!
+  conversationId: String!
+}
+
 type ConversationModel {
   id: ID!
   participantIds: String!
@@ -115,7 +120,7 @@ type Mutation {
   register(newUserInput: RegisterInput!): String!
   createNewOffer(newOfferInput: OfferInput!): String!
   bookmarkOffer(offerId: String!): String!
-  sendMessage(newMessageInput: MessageInput!): String!
+  sendMessage(newMessageInput: MessageInput!): SendMessageResponse!
 }
 
 input RegisterInput {
