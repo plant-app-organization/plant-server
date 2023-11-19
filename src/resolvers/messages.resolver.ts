@@ -91,22 +91,22 @@ export class MessagesResolver {
           id: receiverId,
         },
       })
+
       const msg = {
         //extract the email details
         to: receiverUser.email,
         from: process.env.SENDGRID_EMAIL_SENDER,
-        templateId: 'd-6512303bbdbb4ae88d9ba2b47b787c66',
-        //extract the custom fields
+        templateId: 'd-82f09607fd314d32b3ee8960efce9f96',
         dynamic_template_data: {
-          plantName: 'xxxx',
-          price: 'xxxx',
-          picture: 'xxxxxx',
+          senderName: foundUser.userName,
+          plantName: offer.plantName,
+          picture: offer.pictures[0],
         },
       }
       sgMail
         .send(msg)
         .then(() => {
-          console.log('📨 Email de notification de message envoyé')
+          console.log('📨 Email de notification de message envoyé', msg)
         })
         .catch((error) => {
           console.error(error.response.body)
