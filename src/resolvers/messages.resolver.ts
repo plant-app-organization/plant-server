@@ -30,13 +30,14 @@ export class MessagesResolver {
         clerkId: client.sessions[0].userId,
       },
     })
-    // console.log('foundUser in sendMessage()', foundUser)
+    console.log('foundUser.email in sendMessage()', foundUser.email)
 
     if (foundUser) {
       // get the receiverId from the offerId
       const offer = await this.prisma.offer.findUnique({
         where: { id: messageInput.offerId },
       })
+      console.log('☄️🍕offer', offer)
       const receiverId = offer.authorId
       // check if conversation already exists
       let conversation = await this.prisma.conversation.findFirst({
@@ -83,25 +84,24 @@ export class MessagesResolver {
         },
       })
 
-      // console.log('👉🏻newMessage created in DB ', newMessage)
       await pubSub.publish(`messageAdded.${conversation.id}`, { messageAdded: newMessage })
-
-      const receiverUser = await this.prisma.user.findUnique({
+      const secondParticipantId = conversation.participantIds.find((id) => id !== foundUser.id)
+      const secondParticipant = await this.prisma.user.findUnique({
         where: {
-          id: receiverId,
+          id: secondParticipantId,
         },
       })
-      console.log('🔥receiverUser', receiverUser)
 
       const msg = {
         //extract the email details
-        to: receiverUser.email,
+        to: secondParticipant.email,
         from: process.env.SENDGRID_EMAIL_SENDER,
         templateId: 'd-82f09607fd314d32b3ee8960efce9f96',
         dynamic_template_data: {
           senderName: foundUser.userName,
           plantName: offer.plantName,
           picture: offer.pictures[0],
+          message: messageInput.text,
         },
       }
       sgMail
