@@ -7,7 +7,9 @@ import { MessageModel } from './types/message.model'
 import { SendMessageResponse } from './types/sendMessageResponse'
 import { ConversationModel } from './types/conversation.model'
 import { PubSub } from 'graphql-subscriptions'
+import * as sgMail from '@sendgrid/mail'
 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 const pubSub = new PubSub()
 
 @Resolver()
@@ -83,6 +85,26 @@ export class MessagesResolver {
 
       console.log('👉🏻newMessage created in DB ', newMessage)
       await pubSub.publish(`messageAdded.${conversation.id}`, { messageAdded: newMessage })
+      const msg = {
+        //extract the email details
+        to: foundUser.email,
+        from: process.env.SENDGRID_EMAIL_SENDER,
+        templateId: 'd-6512303bbdbb4ae88d9ba2b47b787c66',
+        //extract the custom fields
+        dynamic_template_data: {
+          plantName: 'xxxx',
+          price: 'xxxx',
+          picture: 'xxxxxx',
+        },
+      }
+      sgMail
+        .send(msg)
+        .then(() => {
+          console.log('📨 Email de notification de message envoyé')
+        })
+        .catch((error) => {
+          console.error(error.response.body)
+        })
 
       return { result: true, conversationId: conversation.id }
     }
