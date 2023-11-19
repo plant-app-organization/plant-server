@@ -4,6 +4,7 @@ import { MessageInput } from './message.input'
 import { PrismaService } from '../prisma.service'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
 import { MessageModel } from './types/message.model'
+import { SendMessageResponse } from './types/sendMessageResponse'
 import { ConversationModel } from './types/conversation.model'
 import { PubSub } from 'graphql-subscriptions'
 
@@ -13,11 +14,11 @@ const pubSub = new PubSub()
 export class MessagesResolver {
   constructor(private prisma: PrismaService) {}
 
-  @Mutation(() => String)
+  @Mutation(() => SendMessageResponse)
   async sendMessage(
     @Context() context,
     @Args('newMessageInput') messageInput: MessageInput,
-  ): Promise<any> {
+  ): Promise<SendMessageResponse> {
     console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥messageInput in sendMessage resolver', messageInput)
     const authorizationHeader = context.req.headers.authorization
     const token = authorizationHeader.split(' ')[1] // extract the token from the header
@@ -83,7 +84,7 @@ export class MessagesResolver {
       console.log('👉🏻newMessage created in DB ', newMessage)
       await pubSub.publish(`messageAdded.${conversation.id}`, { messageAdded: newMessage })
 
-      return { result: true, newConversationId: conversation.id }
+      return { result: true, conversationId: conversation.id }
     }
 
     throw new Error('User not found or not authorized')
