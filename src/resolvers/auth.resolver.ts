@@ -31,6 +31,7 @@ export class AuthResolver {
         userEmail: user.email,
       },
     }
+
     sgMail
       .send(msg)
       .then(() => {
