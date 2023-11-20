@@ -76,6 +76,7 @@ export class GetOffersResolver {
       environmentValues.push('outdoor')
     }
     if (token) {
+      console.log('dans le if token')
       const client = await clerk.clients.verifyClient(token)
       // console.log('client', client)
       // console.log('userId', client.sessions[0].userId)
@@ -132,7 +133,7 @@ export class GetOffersResolver {
           skip: offset,
           take: limit,
         })
-        console.log('🔥foundOffers.length', foundOffers)
+        // console.log('🔥foundOffers.length', foundOffers)
 
         const bookmarkedOffers = foundUser.bookmarks
 
@@ -147,6 +148,8 @@ export class GetOffersResolver {
         throw new Error('Failed to find offers in searchOffers')
       }
     } else {
+      console.log('dans le else')
+      console.log('searcheInput', searchInput)
       try {
         const foundOffers = await this.prisma.offer.findMany({
           where: {
