@@ -37,7 +37,8 @@ export class AuthResolver {
         console.log('✓ Email de notification admin envoyé', msg)
       })
       .catch((error) => {
-        console.error(error.response.body)
+        //
+        console.error(error.response)
       })
 
     return 'user enregistré'
