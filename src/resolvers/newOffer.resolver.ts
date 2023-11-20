@@ -4,8 +4,8 @@ import { PrismaService } from '../prisma.service'
 import { OfferInput } from './offer.input'
 import { User, Offer } from '@prisma/client'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
-import * as sgMail from '@sendgrid/mail'
 import { Subscriber } from 'rxjs'
+import * as sgMail from '@sendgrid/mail'
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
@@ -71,12 +71,37 @@ export class NewOfferResolver {
           picture: newOffer.pictures[0],
         },
       }
+      const admin_msg = {
+        //extract the email details
+        to: process.env.ADMIN_EMAIL_ADDRESS,
+        from: process.env.SENDGRID_EMAIL_SENDER,
+        templateId: 'd-ea1d2cf084814c7f8072e6208c72a6d1',
+        //extract the custom fields
+        dynamic_template_data: {
+          userName: foundUser.userName,
+          plantName: newOffer.plantName,
+          description: newOffer.description,
+          price: newOffer.price,
+          city: newOffer.city,
+          picture1: newOffer.pictures[0],
+          picture2: newOffer.pictures[1],
+          picture3: newOffer.pictures[2],
+        },
+      }
       this.pubSub.publish('offerAdded', { offerAdded: newOffer })
 
       sgMail
         .send(msg)
         .then(() => {
           console.log('📨 Email de confirmation envoyé')
+        })
+        .catch((error) => {
+          console.error(error.response.body)
+        })
+      sgMail
+        .send(admin_msg)
+        .then(() => {
+          console.log('📨 Email admin envoyé')
         })
         .catch((error) => {
           console.error(error.response.body)
