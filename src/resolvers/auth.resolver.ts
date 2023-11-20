@@ -65,14 +65,14 @@ export class AuthResolver {
     }
     console.log('updateInput', updateInput)
     console.log('new image avatar to save', updateInput.avatarUrl)
-    // Mettez à jour l'utilisateur
+    const avatarThumbnail = getThumbnailAvatar(updateInput.avatarUrl)
     return updateInput.avatarUrl
       ? this.prisma.user.update({
           where: { id: foundUser.id },
           data: {
             userBio: updateInput.bio,
             avatar: updateInput.avatarUrl,
-            avatarThumbnail: getThumbnailAvatar(updateInput.avatarUrl),
+            avatarThumbnail: avatarThumbnail,
           },
         })
       : this.prisma.user.update({
