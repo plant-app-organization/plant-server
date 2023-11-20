@@ -52,18 +52,19 @@ export class GetOffersResolver {
     // console.log('🔥filters dans resolver getOffers', filters)
     // Get the authenticated user's ID
     const authorizationHeader = context.req.headers.authorization
-    const token = authorizationHeader.split(' ')[1] // extract the token from the header
+    console.log('context.req.headers.authorization', context.req.headers.authorization)
+    // extract the token from the header
     // console.log('token dans le header', token)
     // console.log('environment', environment)
-    console.log(
-      'new request : limit : ',
-      limit,
-      'offset : ',
-      offset,
-      filters,
-      environment,
-      searchInput,
-    )
+    // console.log(
+    //   'new request : limit : ',
+    //   limit,
+    //   'offset : ',
+    //   offset,
+    //   filters,
+    //   environment,
+    //   searchInput,
+    // )
     const environmentValues: string[] = []
     if (environment === '' || environment === 'indoorAndOutdoor') {
       environmentValues.push('indoor')
@@ -75,7 +76,8 @@ export class GetOffersResolver {
     if (environment === 'outdoor') {
       environmentValues.push('outdoor')
     }
-    if (token) {
+    if (context.req.headers.authorization) {
+      const token = authorizationHeader.split(' ')[1]
       console.log('dans le if token')
       const client = await clerk.clients.verifyClient(token)
       // console.log('client', client)
