@@ -6,10 +6,10 @@ import { User } from '@prisma/client'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
 //comment
 @Resolver()
-export class GetUserDataResolver {
+export class GetMyUserDataResolver {
   constructor(private prisma: PrismaService) {}
   @Query((_returns) => UserModel, { nullable: false, name: 'userData' })
-  async getUserDataById(@Context() context): Promise<User> {
+  async getMyUserData(@Context() context): Promise<User> {
     const authorizationHeader = context.req.headers.authorization
     const token = authorizationHeader.split(' ')[1] // extract the token from the header
     console.log('token dans le header', token)

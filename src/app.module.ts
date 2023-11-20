@@ -11,11 +11,12 @@ import { NewOfferResolver } from './resolvers/newOffer.resolver'
 import { GetOffersResolver } from './resolvers/offers.resolver'
 import { GetUserDataByIdResolver } from './resolvers/getUserDataById.resolver'
 import { BookmarksResolver } from './resolvers/bookmarks.resolver'
-import { GetUserDataResolver } from './resolvers/getUserData.resolver'
+import { GetMyUserDataResolver } from './resolvers/getMyUserData.resolver'
 import { GetPlantersResolver } from './resolvers/planters.resolver'
 import { GetSuggestionsResolver } from './resolvers/suggestions.resolver'
 import { GetOffersDataByIdsResolver } from './resolvers/getOffersDataByIds.resolver'
 import { MessagesResolver } from './resolvers/messages.resolver'
+import { ResetResolver } from './resolvers/resetDatabase.resolver'
 
 @Module({
   imports: [
@@ -42,11 +43,12 @@ import { MessagesResolver } from './resolvers/messages.resolver'
     GetOffersResolver,
     GetUserDataByIdResolver,
     BookmarksResolver,
-    GetUserDataResolver,
+    GetMyUserDataResolver,
     GetPlantersResolver,
     GetSuggestionsResolver,
     GetOffersDataByIdsResolver,
     MessagesResolver,
+    ResetResolver,
   ],
 })
 export class AppModule {

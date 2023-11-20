@@ -33,6 +33,9 @@ export class UserModel implements UserClient {
   @Field(() => String)
   avatar: string
 
+  @Field(() => String)
+  avatarThumbnail: string
+
   @Field(() => Boolean)
   isPro: boolean
 
