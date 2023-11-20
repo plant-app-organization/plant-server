@@ -11,29 +11,30 @@ generator client {
 }
 
 model User {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  email          String        @unique
-  clerkId        String        @unique
-  firstName      String?
-  userName       String
-  lastName       String?
-  password       String?
-  phoneNumber    String?
-  userBio        String?
-  avatar         String?
-  userAddresses  UserAddress[]
-  review         Review[]
-  ordersAsSeller Order[]       @relation("sellerRelation")
-  ordersAsBuyer  Order[]       @relation("buyerRelation")
-  offers         Offer[]
-  offerIds       String[]      @db.ObjectId
-  isActive       Boolean?
-  isPro          Boolean?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  bookmarks      String[]      @db.ObjectId
-  conversations  String[]      @db.ObjectId
-  messages       Message[]
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  email           String        @unique
+  clerkId         String        @unique
+  firstName       String?
+  userName        String
+  lastName        String?
+  password        String?
+  phoneNumber     String?
+  userBio         String?
+  avatar          String?
+  avatarThumbnail String?
+  userAddresses   UserAddress[]
+  review          Review[]
+  ordersAsSeller  Order[]       @relation("sellerRelation")
+  ordersAsBuyer   Order[]       @relation("buyerRelation")
+  offers          Offer[]
+  offerIds        String[]      @db.ObjectId
+  isActive        Boolean?
+  isPro           Boolean?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  bookmarks       String[]      @db.ObjectId
+  conversations   String[]      @db.ObjectId
+  messages        Message[]
 
   @@map("users")
 }
