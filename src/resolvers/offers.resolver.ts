@@ -53,6 +53,7 @@ export class GetOffersResolver {
     // Get the authenticated user's ID
     const authorizationHeader = context.req.headers.authorization
     console.log('context.req.headers.authorization', context.req.headers.authorization)
+    console.log('searchInput', searchInput)
     // extract the token from the header
     // console.log('token dans le header', token)
     // console.log('environment', environment)
@@ -80,10 +81,10 @@ export class GetOffersResolver {
       const token = authorizationHeader.split(' ')[1]
       console.log('dans le if token')
       const client = await clerk.clients.verifyClient(token)
-      // console.log('client', client)
-      // console.log('userId', client.sessions[0].userId)
+      console.log('client', client)
+      console.log('userId', client.sessions[0].userId)
       const user = await clerk.users.getUser(client.sessions[0].userId)
-      // console.log('🪴user', user)
+      console.log('🪴user', user)
 
       const foundUser = await this.prisma.user.findUnique({
         where: {
@@ -91,7 +92,7 @@ export class GetOffersResolver {
         },
       })
 
-      // console.log('foundUser', foundUser)
+      console.log('foundUser.email', foundUser.email)
 
       try {
         const foundOffers = await this.prisma.offer.findMany({
