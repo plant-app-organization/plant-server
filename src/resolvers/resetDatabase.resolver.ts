@@ -10,8 +10,8 @@ export class ResetResolver {
     // Liste de toutes vos opérations de suppression
     await this.prisma.message.deleteMany()
     await this.prisma.conversation.deleteMany()
-    await this.prisma.user.deleteMany()
     await this.prisma.offer.deleteMany()
+    await this.prisma.user.deleteMany()
     await this.prisma.userAddress.deleteMany()
     await this.prisma.plant.deleteMany()
     await this.prisma.review.deleteMany()
