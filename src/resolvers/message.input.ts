@@ -5,7 +5,7 @@ export class MessageInput {
   @Field()
   offerId: string
 
-  @Field()
+  @Field({ nullable: true })
   existingConversationId: string
 
   @Field()

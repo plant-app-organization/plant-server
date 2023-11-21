@@ -163,7 +163,7 @@ input OfferInput {
 
 input MessageInput {
   offerId: String!
-  existingConversationId: String!
+  existingConversationId: String
   text: String!
 }
 
