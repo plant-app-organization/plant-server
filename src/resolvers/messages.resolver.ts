@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Args, Context, Query, Subscription } from '@nestjs/graphql'
-import { Message } from '@prisma/client'
+import { Conversation, Message } from '@prisma/client'
 import { MessageInput } from './message.input'
 import { PrismaService } from '../prisma.service'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
@@ -53,15 +53,24 @@ export class MessagesResolver {
     }
 
     const receiverId = offer.authorId
-    let conversation = await this.prisma.conversation.findFirst({
-      where: {
-        AND: [
-          { participantIds: { has: foundUser.id } },
-          { participantIds: { has: receiverId } },
-          { offerId: messageInput.offerId },
-        ],
-      },
-    })
+    console.log('-> offer.authorId', offer.authorId)
+    console.log('-> receiverId', receiverId)
+    let conversation: Conversation
+    if (!messageInput.existingConversationId) {
+      conversation = await this.prisma.conversation.findFirst({
+        where: {
+          AND: [
+            { participantIds: { has: foundUser.id } },
+            { participantIds: { has: receiverId } },
+            { offerId: messageInput.offerId },
+          ],
+        },
+      })
+    } else {
+      conversation = await this.prisma.conversation.findUnique({
+        where: { id: messageInput.existingConversationId },
+      })
+    }
     console.log('-> conversation trouvée', conversation.id)
 
     if (!conversation) {
