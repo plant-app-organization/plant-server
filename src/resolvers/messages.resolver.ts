@@ -22,6 +22,7 @@ export class MessagesResolver {
     @Context() context,
     @Args('newMessageInput') messageInput: MessageInput,
   ): Promise<SendMessageResponse> {
+    console.log('messageInput', messageInput)
     if (!context.req.headers.authorization) {
       throw new Error('Authorization header is missing')
     }
@@ -70,8 +71,8 @@ export class MessagesResolver {
       conversation = await this.prisma.conversation.findUnique({
         where: { id: messageInput.existingConversationId },
       })
+      console.log('-> conversation trouvée', conversation.id)
     }
-    console.log('-> conversation trouvée', conversation.id)
 
     if (!conversation) {
       conversation = await this.prisma.conversation.create({
