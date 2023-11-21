@@ -198,6 +198,9 @@ export class MessagesResolver {
                 has: foundUser.id,
               },
             },
+            orderBy: {
+              updatedAt: 'desc',
+            },
             include: {
               offer: {
                 select: {
