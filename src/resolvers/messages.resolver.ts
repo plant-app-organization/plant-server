@@ -155,6 +155,7 @@ export class MessagesResolver {
       const token = authorizationHeader.split(' ')[1] // extract the token from the header
       const client = await clerk.clients.verifyClient(token)
 
+
       if (client) {
         const foundUser = await this.prisma.user.findUnique({
           where: {
@@ -186,6 +187,7 @@ export class MessagesResolver {
         } else {
           throw new Error('Access denied')
         }
+
       }
     }
   }
