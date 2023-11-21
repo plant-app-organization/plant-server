@@ -6,5 +6,8 @@ export class MessageInput {
   offerId: string
 
   @Field()
+  existingConversationId: string
+
+  @Field()
   text: string
 }
