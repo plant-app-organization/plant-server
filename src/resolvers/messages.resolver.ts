@@ -94,16 +94,21 @@ export class MessagesResolver {
       })
 
       // Notification push
-      const pushNotificationResponse = axios.post(
-        `https://app.nativenotify.com/api/indie/notification`,
-        {
-          subID: secondParticipant.email,
-          appId: 15168,
-          appToken: '2NQv5UM3ppjj8VIDgMfgb4',
-          title: `✉️ Nouveau message de ${foundUser.userName}`,
-          message: messageInput.text,
-        },
-      )
+      try {
+        const pushNotificationResponse = axios.post(
+          `https://app.nativenotify.com/api/indie/notification`,
+          {
+            subID: secondParticipant.email,
+            appId: 15168,
+            appToken: '2NQv5UM3ppjj8VIDgMfgb4',
+            title: `✉️ Nouveau message de ${foundUser.userName}`,
+            message: messageInput.text,
+          },
+        )
+      } catch (error) {
+        console.error('Erreur lors de la requête Push-notification:', error)
+        // Gestion de l'erreur
+      }
       // console.log('response Push Notification', pushNotificationResponse)
       // Notification email
       const msg = {
