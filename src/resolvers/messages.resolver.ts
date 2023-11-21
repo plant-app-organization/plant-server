@@ -8,6 +8,7 @@ import { SendMessageResponse } from './types/sendMessageResponse'
 import { ConversationModel } from './types/conversation.model'
 import { PubSub } from 'graphql-subscriptions'
 import * as sgMail from '@sendgrid/mail'
+import axios from 'axios'
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 const pubSub = new PubSub()
@@ -92,8 +93,20 @@ export class MessagesResolver {
         },
       })
 
+      // Notification push
+      const pushNotificationResponse = await axios.post(
+        `https://app.nativenotify.com/api/indie/notification`,
+        {
+          subID: secondParticipant.email,
+          appId: 15168,
+          appToken: '2NQv5UM3ppjj8VIDgMfgb4',
+          title: `✉️ Nouveau message de ${foundUser.userName}`,
+          message: messageInput.text,
+        },
+      )
+      console.log('response Push Notification', pushNotificationResponse)
+      // Notification email
       const msg = {
-        //extract the email details
         to: secondParticipant.email,
         from: process.env.SENDGRID_EMAIL_SENDER,
         templateId: 'd-82f09607fd314d32b3ee8960efce9f96',
