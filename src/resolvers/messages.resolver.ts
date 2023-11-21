@@ -145,39 +145,40 @@ export class MessagesResolver {
     @Args('offerId') offerId: string,
   ): Promise<string> {
     console.log('Data in getIsConversationExisting', 'userId1', userId1, 'offerId', offerId)
-
-    const authorizationHeader = context.req.headers.authorization
-    const token = authorizationHeader.split(' ')[1] // extract the token from the header
-    const client = await clerk.clients.verifyClient(token)
-    const foundUser = await this.prisma.user.findUnique({
-      where: {
-        clerkId: client.sessions[0].userId,
-      },
-    })
-    console.log('foundUser in sendMessage()', foundUser)
-
-    if (foundUser) {
-      const foundConversation = await this.prisma.conversation.findFirst({
+    if (context.req.headers.authorization) {
+      const authorizationHeader = context.req.headers.authorization
+      const token = authorizationHeader.split(' ')[1] // extract the token from the header
+      const client = await clerk.clients.verifyClient(token)
+      const foundUser = await this.prisma.user.findUnique({
         where: {
-          AND: [
-            {
-              participantIds: { has: userId1 },
-            },
-            {
-              participantIds: { has: foundUser.id },
-            },
-            {
-              offerId: offerId,
-            },
-          ],
+          clerkId: client.sessions[0].userId,
         },
       })
+      console.log('foundUser in sendMessage()', foundUser)
 
-      console.log('☀️foundConversation', foundConversation)
+      if (foundUser) {
+        const foundConversation = await this.prisma.conversation.findFirst({
+          where: {
+            AND: [
+              {
+                participantIds: { has: userId1 },
+              },
+              {
+                participantIds: { has: foundUser.id },
+              },
+              {
+                offerId: offerId,
+              },
+            ],
+          },
+        })
 
-      return foundConversation ? foundConversation.id : null
-    } else {
-      throw new Error('Access denied')
+        console.log('☀️foundConversation', foundConversation)
+
+        return foundConversation ? foundConversation.id : null
+      } else {
+        throw new Error('Access denied')
+      }
     }
   }
 
