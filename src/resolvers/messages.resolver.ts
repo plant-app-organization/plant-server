@@ -187,76 +187,78 @@ export class MessagesResolver {
     description: 'Get all conversations of the authenticated user',
   })
   async getUserConversations(@Context() context): Promise<any> {
-    const authorizationHeader = context.req.headers.authorization
-    const token = authorizationHeader.split(' ')[1] // extract the token from the header
-    const client = await clerk.clients.verifyClient(token)
-    const foundUser = await this.prisma.user.findUnique({
-      where: {
-        clerkId: client.sessions[0].userId,
-      },
-    })
-
-    if (foundUser) {
-      const userConversations = await this.prisma.conversation.findMany({
+    if (context.req.headers.authorization) {
+      const authorizationHeader = context.req.headers.authorization
+      const token = authorizationHeader.split(' ')[1] // extract the token from the header
+      const client = await clerk.clients.verifyClient(token)
+      const foundUser = await this.prisma.user.findUnique({
         where: {
-          participantIds: {
-            has: foundUser.id,
-          },
-        },
-        include: {
-          offer: {
-            select: {
-              authorId: true,
-              category: true,
-              createdAt: true,
-              description: true,
-              health: true,
-              id: true,
-              isActive: true,
-              maintenanceDifficultyLevel: true,
-              pictures: true,
-              plantHeight: true,
-              plantName: true,
-              environment: true,
-              latitude: true,
-              longitude: true,
-              pot: true,
-              price: true,
-              updatedAt: true,
-              city: true,
-            },
-          },
+          clerkId: client.sessions[0].userId,
         },
       })
 
-      // Fetch participant details for each conversation
-      const populatedConversations = await Promise.all(
-        userConversations.map(async (conversation) => {
-          const participants = (
-            await this.prisma.user.findMany({
-              where: {
-                id: {
-                  in: conversation.participantIds,
-                },
-              },
+      if (foundUser) {
+        const userConversations = await this.prisma.conversation.findMany({
+          where: {
+            participantIds: {
+              has: foundUser.id,
+            },
+          },
+          include: {
+            offer: {
               select: {
-                userName: true,
-                avatar: true,
+                authorId: true,
+                category: true,
+                createdAt: true,
+                description: true,
+                health: true,
                 id: true,
+                isActive: true,
+                maintenanceDifficultyLevel: true,
+                pictures: true,
+                plantHeight: true,
+                plantName: true,
+                environment: true,
+                latitude: true,
+                longitude: true,
+                pot: true,
+                price: true,
+                updatedAt: true,
+                city: true,
               },
-            })
-          ).filter((participant) => participant.id !== foundUser.id)
+            },
+          },
+        })
 
-          return {
-            ...conversation,
-            participants,
-          }
-        }),
-      )
-      console.log('=>', populatedConversations)
-      return populatedConversations
-    } else {
-      throw new Error('Access denied')
+        // Fetch participant details for each conversation
+        const populatedConversations = await Promise.all(
+          userConversations.map(async (conversation) => {
+            const participants = (
+              await this.prisma.user.findMany({
+                where: {
+                  id: {
+                    in: conversation.participantIds,
+                  },
+                },
+                select: {
+                  userName: true,
+                  avatar: true,
+                  id: true,
+                },
+              })
+            ).filter((participant) => participant.id !== foundUser.id)
+
+            return {
+              ...conversation,
+              participants,
+            }
+          }),
+        )
+        console.log('=>', populatedConversations)
+        return populatedConversations
+      } else {
+        throw new Error('Access denied')
+      }
     }
   }
 
