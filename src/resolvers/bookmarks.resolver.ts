@@ -19,107 +19,110 @@ export class BookmarksResolver {
       // console.log('🥵token dans le header', token)
 
       const client = await clerk.clients.verifyClient(token)
-      // console.log('client', client)
-      // console.log('userId', client.sessions[0].userId)
       const user = await clerk.users.getUser(client.sessions[0].userId)
-      // console.log('🪴user', user)
 
-      const foundUser = await this.prisma.user.findUnique({
-        where: {
-          clerkId: client.sessions[0].userId,
-        },
-      })
+      if (client && user) {
+        // console.log('client', client)
+        // console.log('userId', client.sessions[0].userId)
+        // console.log('🪴user', user)
 
-      // console.log('foundUser', foundUser)
+        const foundUser = await this.prisma.user.findUnique({
+          where: {
+            clerkId: client.sessions[0].userId,
+          },
+        })
 
-      //Check if user has already bookmarked this offer
-      const offer = await this.prisma.offer.findUnique({
-        where: {
-          id: offerId,
-        },
-        select: {
-          bookmarkedBy: true,
-        },
-      })
-      const bookmarksContainOfferId = foundUser.bookmarks.includes(offerId)
-      console.log('🧡bookmarksContainOfferId', bookmarksContainOfferId)
-      const bookmarkedByContainUserId = offer.bookmarkedBy.includes(foundUser.id)
-      console.log('bookmarkedByContainUserId', bookmarkedByContainUserId)
-      // if not Create a new bookmark for the user and offer
-      if (!bookmarksContainOfferId) {
-        try {
-          const updatedUser = await this.prisma.user.update({
-            where: {
-              id: foundUser.id,
-            },
-            data: {
-              bookmarks: {
-                push: offerId,
+        // console.log('foundUser', foundUser)
+
+        //Check if user has already bookmarked this offer
+        const offer = await this.prisma.offer.findUnique({
+          where: {
+            id: offerId,
+          },
+          select: {
+            bookmarkedBy: true,
+          },
+        })
+        const bookmarksContainOfferId = foundUser.bookmarks.includes(offerId)
+        console.log('🧡bookmarksContainOfferId', bookmarksContainOfferId)
+        const bookmarkedByContainUserId = offer.bookmarkedBy.includes(foundUser.id)
+        console.log('bookmarkedByContainUserId', bookmarkedByContainUserId)
+        // if not Create a new bookmark for the user and offer
+        if (!bookmarksContainOfferId) {
+          try {
+            const updatedUser = await this.prisma.user.update({
+              where: {
+                id: foundUser.id,
               },
-            },
-          })
-
-          const updatedOffer = await this.prisma.offer.update({
-            where: {
-              id: offerId,
-            },
-            data: {
-              bookmarkedBy: {
-                push: foundUser.id,
+              data: {
+                bookmarks: {
+                  push: offerId,
+                },
               },
-            },
-          })
-          // console.log('updatedUser', updatedUser)
-          // console.log('updatedOffer', updatedOffer)
+            })
 
-          return true
-        } catch (error) {
-          console.log('🤯error', error)
-          return false
+            const updatedOffer = await this.prisma.offer.update({
+              where: {
+                id: offerId,
+              },
+              data: {
+                bookmarkedBy: {
+                  push: foundUser.id,
+                },
+              },
+            })
+            // console.log('updatedUser', updatedUser)
+            // console.log('updatedOffer', updatedOffer)
+
+            return true
+          } catch (error) {
+            console.log('🤯error', error)
+            return false
+          }
+        } else {
+          // already in bookmarks => Delete bookmark
+          try {
+            const updatedUser = await this.prisma.user.update({
+              where: {
+                id: foundUser.id,
+              },
+              data: {
+                bookmarks: {
+                  set: foundUser.bookmarks.filter((el) => el !== offerId),
+                },
+              },
+            })
+            const offer = await this.prisma.offer.findUnique({
+              where: {
+                id: offerId,
+              },
+              select: {
+                bookmarkedBy: true,
+              },
+            })
+
+            const removedOffer = await this.prisma.offer.update({
+              where: {
+                id: offerId,
+              },
+              data: {
+                bookmarkedBy: {
+                  set: offer.bookmarkedBy.filter((el) => el !== foundUser.id),
+                },
+              },
+            })
+            console.log('updatedUser', updatedUser)
+            console.log('removedOffer', removedOffer)
+
+            return true
+          } catch (error) {
+            console.log('🤯error', error)
+            return false
+          }
         }
       } else {
-        // already in bookmarks => Delete bookmark
-        try {
-          const updatedUser = await this.prisma.user.update({
-            where: {
-              id: foundUser.id,
-            },
-            data: {
-              bookmarks: {
-                set: foundUser.bookmarks.filter((el) => el !== offerId),
-              },
-            },
-          })
-          const offer = await this.prisma.offer.findUnique({
-            where: {
-              id: offerId,
-            },
-            select: {
-              bookmarkedBy: true,
-            },
-          })
-
-          const removedOffer = await this.prisma.offer.update({
-            where: {
-              id: offerId,
-            },
-            data: {
-              bookmarkedBy: {
-                set: offer.bookmarkedBy.filter((el) => el !== foundUser.id),
-              },
-            },
-          })
-          console.log('updatedUser', updatedUser)
-          console.log('removedOffer', removedOffer)
-
-          return true
-        } catch (error) {
-          console.log('🤯error', error)
-          return false
-        }
+        return false
       }
-    } else {
-      return false
     }
   }
 
@@ -129,84 +132,27 @@ export class BookmarksResolver {
     @Args('offerId') offerId: string,
   ): Promise<boolean> {
     console.log('🔥offerId dans le resolver bookmarkOffer', offerId)
+    if (context.req.headers.authorization) {
+      // Get the authenticated user's ID
+      const authorizationHeader = context.req.headers.authorization
+      const token = authorizationHeader.split(' ')[1] // extract the token from the header
+      console.log('token dans le header', token)
 
-    // Get the authenticated user's ID
-    const authorizationHeader = context.req.headers.authorization
-    const token = authorizationHeader.split(' ')[1] // extract the token from the header
-    console.log('token dans le header', token)
-
-    const client = await clerk.clients.verifyClient(token)
-    // console.log('client', client)
-    // console.log('userId', client.sessions[0].userId)
-    const user = await clerk.users.getUser(client.sessions[0].userId)
-    // console.log('🪴user', user)
-
-    const foundUser = await this.prisma.user.findUnique({
-      where: {
-        clerkId: client.sessions[0].userId,
-      },
-    })
-
-    // console.log('foundUser', foundUser)
-
-    //Check if user has already bookmarked this offer
-    const offer = await this.prisma.offer.findUnique({
-      where: {
-        id: offerId,
-      },
-      select: {
-        bookmarkedBy: true,
-      },
-    })
-    const bookmarksContainOfferId = foundUser.bookmarks.includes(offerId)
-    console.log('🧡bookmarksContainOfferId', bookmarksContainOfferId)
-    const bookmarkedByContainUserId = offer.bookmarkedBy.includes(foundUser.id)
-    console.log('bookmarkedByContainUserId', bookmarkedByContainUserId)
-    // if not Create a new bookmark for the user and offer
-    if (!bookmarksContainOfferId) {
-      try {
-        const updatedUser = await this.prisma.user.update({
+      const client = await clerk.clients.verifyClient(token)
+      // console.log('client', client)
+      // console.log('userId', client.sessions[0].userId)
+      const user = await clerk.users.getUser(client.sessions[0].userId)
+      // console.log('🪴user', user)
+      if (client && user) {
+        const foundUser = await this.prisma.user.findUnique({
           where: {
-            id: foundUser.id,
-          },
-          data: {
-            bookmarks: {
-              push: offerId,
-            },
+            clerkId: client.sessions[0].userId,
           },
         })
 
-        const updatedOffer = await this.prisma.offer.update({
-          where: {
-            id: offerId,
-          },
-          data: {
-            bookmarkedBy: {
-              push: foundUser.id,
-            },
-          },
-        })
-        // console.log('updatedUser', updatedUser)
-        // console.log('updatedOffer', updatedOffer)
+        // console.log('foundUser', foundUser)
 
-        return true
-      } catch (error) {
-        console.log('🤯error', error)
-        return false
-      }
-    } else {
-      // already in bookmarks => Delete bookmark
-      try {
-        const updatedUser = await this.prisma.user.update({
-          where: {
-            id: foundUser.id,
-          },
-          data: {
-            bookmarks: {
-              set: foundUser.bookmarks.filter((el) => el !== offerId),
-            },
-          },
-        })
+        //Check if user has already bookmarked this offer
         const offer = await this.prisma.offer.findUnique({
           where: {
             id: offerId,
@@ -215,61 +161,125 @@ export class BookmarksResolver {
             bookmarkedBy: true,
           },
         })
+        const bookmarksContainOfferId = foundUser.bookmarks.includes(offerId)
+        console.log('🧡bookmarksContainOfferId', bookmarksContainOfferId)
+        const bookmarkedByContainUserId = offer.bookmarkedBy.includes(foundUser.id)
+        console.log('bookmarkedByContainUserId', bookmarkedByContainUserId)
+        // if not Create a new bookmark for the user and offer
+        if (!bookmarksContainOfferId) {
+          try {
+            const updatedUser = await this.prisma.user.update({
+              where: {
+                id: foundUser.id,
+              },
+              data: {
+                bookmarks: {
+                  push: offerId,
+                },
+              },
+            })
 
-        const removedOffer = await this.prisma.offer.update({
-          where: {
-            id: offerId,
-          },
-          data: {
-            bookmarkedBy: {
-              set: offer.bookmarkedBy.filter((el) => el !== foundUser.id),
-            },
-          },
-        })
-        console.log('updatedUser', updatedUser)
-        console.log('removedOffer', removedOffer)
+            const updatedOffer = await this.prisma.offer.update({
+              where: {
+                id: offerId,
+              },
+              data: {
+                bookmarkedBy: {
+                  push: foundUser.id,
+                },
+              },
+            })
+            // console.log('updatedUser', updatedUser)
+            // console.log('updatedOffer', updatedOffer)
 
-        return true
-      } catch (error) {
-        console.log('🤯error', error)
-        return false
+            return true
+          } catch (error) {
+            console.log('🤯error', error)
+            return false
+          }
+        } else {
+          // already in bookmarks => Delete bookmark
+          try {
+            const updatedUser = await this.prisma.user.update({
+              where: {
+                id: foundUser.id,
+              },
+              data: {
+                bookmarks: {
+                  set: foundUser.bookmarks.filter((el) => el !== offerId),
+                },
+              },
+            })
+            const offer = await this.prisma.offer.findUnique({
+              where: {
+                id: offerId,
+              },
+              select: {
+                bookmarkedBy: true,
+              },
+            })
+
+            const removedOffer = await this.prisma.offer.update({
+              where: {
+                id: offerId,
+              },
+              data: {
+                bookmarkedBy: {
+                  set: offer.bookmarkedBy.filter((el) => el !== foundUser.id),
+                },
+              },
+            })
+            console.log('updatedUser', updatedUser)
+            console.log('removedOffer', removedOffer)
+
+            return true
+          } catch (error) {
+            console.log('🤯error', error)
+            return false
+          }
+        }
       }
     }
   }
+
   // get user bookmarks without any other information
   @Query((_returns) => [Offer], { nullable: false, name: 'userBookmarks' })
   async getUserBookmarks(@Context() context): Promise<Offer[]> {
-    const authorizationHeader = context.req.headers.authorization
-    const token = authorizationHeader.split(' ')[1] // extract the token from the header
-    console.log('token dans le header', token)
+    if (context.req.headers.authorization) {
+      const authorizationHeader = context.req.headers.authorization
+      const token = authorizationHeader.split(' ')[1] // extract the token from the header
+      console.log('token dans le header', token)
 
-    const client = await clerk.clients.verifyClient(token)
-    console.log('client', client)
-    console.log('userId', client.sessions[0].userId)
-    const user = await clerk.users.getUser(client.sessions[0].userId)
-    console.log('🪴user', user)
+      const client = await clerk.clients.verifyClient(token)
+      console.log('client', client)
+      console.log('userId', client.sessions[0].userId)
+      const user = await clerk.users.getUser(client.sessions[0].userId)
+      console.log('🪴user', user)
 
-    const foundUser = await this.prisma.user.findUnique({
-      where: {
-        clerkId: client.sessions[0].userId,
-      },
-    })
+      if (client && user) {
+        const foundUser = await this.prisma.user.findUnique({
+          where: {
+            clerkId: client.sessions[0].userId,
+          },
+        })
 
-    console.log('foundUser', foundUser)
-    const userAndBookmarks = await this.prisma.user.findUnique({
-      where: { id: foundUser.id },
-    })
+        console.log('foundUser', foundUser)
+        const userAndBookmarks = await this.prisma.user.findUnique({
+          where: { id: foundUser.id },
+        })
 
-    // Next, extract the offer IDs from the bookmarks array
-    // const offerIds = userAndBookmarks.bookmarks.map((bookmark) => bookmark.id)
+        // Next, extract the offer IDs from the bookmarks array
+        // const offerIds = userAndBookmarks.bookmarks.map((bookmark) => bookmark.id)
 
-    // Finally, fetch the offers with the extracted IDs
-    const bookmarks = await this.prisma.offer.findMany({
-      where: { id: { in: userAndBookmarks.bookmarks } },
-    })
+        // Finally, fetch the offers with the extracted IDs
+        const bookmarks = await this.prisma.offer.findMany({
+          where: { id: { in: userAndBookmarks.bookmarks } },
+        })
 
-    // Combine the offers with the user object
+        // Combine the offers with the user object
 
-    return bookmarks
+        return bookmarks
+      }
+    }
   }
 }
