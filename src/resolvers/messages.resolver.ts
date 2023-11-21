@@ -22,124 +22,99 @@ export class MessagesResolver {
     @Context() context,
     @Args('newMessageInput') messageInput: MessageInput,
   ): Promise<SendMessageResponse> {
-    if (context.req.headers.authorization) {
-      const authorizationHeader = context.req.headers.authorization
-      const token = authorizationHeader.split(' ')[1] // extract the token from the header
-      const client = await clerk.clients.verifyClient(token)
-      if (client) {
-        const foundUser = await this.prisma.user.findUnique({
-          where: {
-            clerkId: client.sessions[0].userId,
-          },
-        })
-        console.log('foundUser.email in sendMessage()', foundUser.email)
-
-        if (foundUser) {
-          // get the receiverId from the offerId
-          const offer = await this.prisma.offer.findUnique({
-            where: { id: messageInput.offerId },
-          })
-          console.log('☄️🍕offer', offer)
-          const receiverId = offer.authorId
-          // check if conversation already exists
-          let conversation = await this.prisma.conversation.findFirst({
-            where: {
-              AND: [
-                {
-                  participantIds: {
-                    has: foundUser.id,
-                  },
-                },
-                {
-                  participantIds: {
-                    has: receiverId,
-                  },
-                },
-                {
-                  offerId: messageInput.offerId,
-                },
-              ],
-            },
-          })
-
-          // console.log('found conversation :', conversation)
-
-          // if no conversation exists, create new conversation
-          if (!conversation) {
-            // console.log('conversation didnt exist')
-            conversation = await this.prisma.conversation.create({
-              data: {
-                offerId: messageInput.offerId,
-                participantIds: [foundUser.id, receiverId],
-              },
-            })
-
-            // console.log('👉🏻new Conversation created in DB ')
-          }
-
-          // Create new message document in DB
-          const newMessage = await this.prisma.message.create({
-            data: {
-              senderId: foundUser.id,
-              conversationId: conversation.id,
-              text: messageInput.text,
-            },
-          })
-
-          await pubSub.publish(`messageAdded.${conversation.id}`, { messageAdded: newMessage })
-          const secondParticipantId = conversation.participantIds.find((id) => id !== foundUser.id)
-          const secondParticipant = await this.prisma.user.findUnique({
-            where: {
-              id: secondParticipantId,
-            },
-          })
-
-          // Notification push
-          try {
-            const pushNotificationResponse = axios.post(
-              `https://app.nativenotify.com/api/indie/notification`,
-              {
-                subID: secondParticipant.email,
-                appId: 15168,
-                appToken: '2NQv5UM3ppjj8VIDgMfgb4',
-                title: `✉️ Nouveau message de ${foundUser.userName}`,
-                message: messageInput.text,
-              },
-            )
-          } catch (error) {
-            console.error('Erreur lors de la requête Push-notification:', error)
-            // Gestion de l'erreur
-          }
-          // console.log('response Push Notification', pushNotificationResponse)
-          // Notification email
-          const msg = {
-            to: secondParticipant.email,
-            from: process.env.SENDGRID_EMAIL_SENDER,
-            templateId: 'd-82f09607fd314d32b3ee8960efce9f96',
-            dynamic_template_data: {
-              senderName: foundUser.userName,
-              plantName: offer.plantName,
-              picture: offer.pictures[0],
-              message: messageInput.text,
-            },
-          }
-          sgMail
-            .send(msg)
-            .then(() => {
-              console.log('📨 Email de notification de message envoyé', msg)
-            })
-            .catch((error) => {
-              console.error(error.response.body)
-            })
-
-          return { result: true, conversationId: conversation.id }
-        }
-
-        throw new Error('User not found or not authorized')
-      }
+    if (!context.req.headers.authorization) {
+      throw new Error('Authorization header is missing')
     }
-  }
 
+    const authorizationHeader = context.req.headers.authorization
+    const token = authorizationHeader.split(' ')[1]
+    const client = await clerk.clients.verifyClient(token)
+
+    if (!client) {
+      throw new Error('Invalid client token')
+    }
+
+    const foundUser = await this.prisma.user.findUnique({
+      where: {
+        clerkId: client.sessions[0].userId,
+      },
+    })
+
+    if (!foundUser) {
+      throw new Error('User not found')
+    }
+
+    const offer = await this.prisma.offer.findUnique({
+      where: { id: messageInput.offerId },
+    })
+
+    if (!offer) {
+      throw new Error('Offer not found')
+    }
+
+    const receiverId = offer.authorId
+    let conversation = await this.prisma.conversation.findFirst({
+      where: {
+        AND: [
+          { participantIds: { has: foundUser.id } },
+          { participantIds: { has: receiverId } },
+          { offerId: messageInput.offerId },
+        ],
+      },
+    })
+
+    if (!conversation) {
+      conversation = await this.prisma.conversation.create({
+        data: {
+          offerId: messageInput.offerId,
+          participantIds: [foundUser.id, receiverId],
+        },
+      })
+    }
+
+    const newMessage = await this.prisma.message.create({
+      data: {
+        senderId: foundUser.id,
+        conversationId: conversation.id,
+        text: messageInput.text,
+      },
+    })
+
+    await pubSub.publish(`messageAdded.${conversation.id}`, { messageAdded: newMessage })
+
+    const secondParticipantId = conversation.participantIds.find((id) => id !== foundUser.id)
+    const secondParticipant = await this.prisma.user.findUnique({
+      where: { id: secondParticipantId },
+    })
+
+    // Envoi de la notification push (ne pas attendre la réponse)
+    axios
+      .post(`https://app.nativenotify.com/api/indie/notification`, {
+        subID: secondParticipant.email,
+        appId: 15168,
+        appToken: '2NQv5UM3ppjj8VIDgMfgb4',
+        title: `✉️ Nouveau message de ${foundUser.userName}`,
+        message: messageInput.text,
+      })
+      .catch((error) => console.error('Erreur notification push:', error))
+
+    // Envoi de l'email (ne pas attendre la réponse)
+    const msg = {
+      to: secondParticipant.email,
+      from: process.env.SENDGRID_EMAIL_SENDER,
+      templateId: 'd-82f09607fd314d32b3ee8960efce9f96',
+      dynamic_template_data: {
+        senderName: foundUser.userName,
+        plantName: offer.plantName,
+        picture: offer.pictures[0],
+        message: messageInput.text,
+      },
+    }
+
+    sgMail.send(msg).catch((error) => console.error('Erreur envoi email:', error))
+
+    return { result: true, conversationId: conversation.id }
+  }
   // console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥messageInput in sendMessage resolver', messageInput)
 
   // check if conversation is already created between two users about   an offer
@@ -154,7 +129,6 @@ export class MessagesResolver {
       const authorizationHeader = context.req.headers.authorization
       const token = authorizationHeader.split(' ')[1] // extract the token from the header
       const client = await clerk.clients.verifyClient(token)
-
 
       if (client) {
         const foundUser = await this.prisma.user.findUnique({
@@ -187,7 +161,6 @@ export class MessagesResolver {
         } else {
           throw new Error('Access denied')
         }
-
       }
     }
   }
