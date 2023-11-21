@@ -94,17 +94,17 @@ export class MessagesResolver {
       })
 
       // Notification push
-      const pushNotificationResponse = await axios.post(
-        `https://app.nativenotify.com/api/indie/notification`,
-        {
-          subID: secondParticipant.email,
-          appId: 15168,
-          appToken: '2NQv5UM3ppjj8VIDgMfgb4',
-          title: `✉️ Nouveau message de ${foundUser.userName}`,
-          message: messageInput.text,
-        },
-      )
-      console.log('response Push Notification', pushNotificationResponse)
+      // const pushNotificationResponse = await axios.post(
+      //   `https://app.nativenotify.com/api/indie/notification`,
+      //   {
+      //     subID: secondParticipant.email,
+      //     appId: 15168,
+      //     appToken: '2NQv5UM3ppjj8VIDgMfgb4',
+      //     title: `✉️ Nouveau message de ${foundUser.userName}`,
+      //     message: messageInput.text,
+      //   },
+      // )
+      // console.log('response Push Notification', pushNotificationResponse)
       // Notification email
       const msg = {
         to: secondParticipant.email,
