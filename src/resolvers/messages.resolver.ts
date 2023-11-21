@@ -62,6 +62,7 @@ export class MessagesResolver {
         ],
       },
     })
+    console.log('-> conversation trouvée', conversation.id)
 
     if (!conversation) {
       conversation = await this.prisma.conversation.create({
