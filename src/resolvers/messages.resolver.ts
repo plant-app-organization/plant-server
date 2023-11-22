@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args, Context, Query, Subscription } from '@nestjs/graphql'
+import { Resolver, Mutation, Args, Context, Query, Subscription, Int } from '@nestjs/graphql'
 import { Conversation, Message } from '@prisma/client'
 import { MessageInput } from './message.input'
 import { PrismaService } from '../prisma.service'
@@ -267,6 +267,8 @@ export class MessagesResolver {
   })
   async getConversationMessages(
     @Args('conversationId') conversationId: string,
+    @Args('offset', { type: () => Int, defaultValue: 0 }) offset: number,
+    @Args('limit', { type: () => Int, defaultValue: 12 }) limit: number,
   ): Promise<Message[]> {
     console.log('conversationId in getConversationMessages', conversationId)
     const conversationData = await this.prisma.message.findMany({
@@ -274,6 +276,8 @@ export class MessagesResolver {
       orderBy: {
         createdAt: 'asc',
       },
+      skip: offset,
+      take: limit,
     })
     console.log('conversatIONData', conversationData)
     return conversationData

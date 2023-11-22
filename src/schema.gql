@@ -114,7 +114,7 @@ type Query {
   UserConversations: [ConversationModel!]!
 
   """Get List of Messages for a given conversation"""
-  MessagesList(conversationId: String!): [MessageModel!]!
+  MessagesList(conversationId: String!, offset: Int! = 0, limit: Int! = 12): [MessageModel!]!
 }
 
 type Mutation {
