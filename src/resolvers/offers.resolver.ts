@@ -48,11 +48,12 @@ export class GetOffersResolver {
     @Args('offset', { type: () => Int, defaultValue: 0 }) offset: number,
     @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
   ): Promise<Offer[]> {
+    console.log('==> offset', offset, 'limit', limit)
     // console.log('🔎searchInput dans resolver getOffers', searchInput)
     // console.log('🔥filters dans resolver getOffers', filters)
     // Get the authenticated user's ID
     const authorizationHeader = context.req.headers.authorization
-    console.log('context.req.headers.authorization', context.req.headers.authorization)
+    // console.log('context.req.headers.authorization', context.req.headers.authorization)
     console.log('searchInput', searchInput)
     // extract the token from the header
     // console.log('token dans le header', token)
