@@ -272,7 +272,7 @@ export class MessagesResolver {
     const conversationData = await this.prisma.message.findMany({
       where: { conversationId },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: 'asc',
       },
     })
     console.log('conversatIONData', conversationData)
