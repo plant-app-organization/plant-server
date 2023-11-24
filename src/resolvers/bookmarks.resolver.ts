@@ -3,7 +3,9 @@ import { PrismaService } from '../prisma.service'
 import { Offer } from './types/offer.model'
 import { User } from '@prisma/client'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
-//comment
+import * as sgMail from '@sendgrid/mail'
+import axios from 'axios'
+
 @Resolver()
 export class BookmarksResolver {
   constructor(private prisma: PrismaService) {}
@@ -72,8 +74,57 @@ export class BookmarksResolver {
               },
             })
             // console.log('updatedUser', updatedUser)
-            // console.log('updatedOffer', updatedOffer)
+            console.log('updatedOffer', updatedOffer)
+            //* get offer author email
+            const offerAuthor = await this.prisma.user.findUnique({
+              where: { id: updatedOffer.authorId },
+            })
 
+            // * Notification à l'auteur de l'annonce
+            axios
+              .post(`https://app.nativenotify.com/api/indie/notification`, {
+                subID: offerAuthor.email,
+                appId: 15168,
+                appToken: '2NQv5UM3ppjj8VIDgMfgb4',
+                title: `💚 ${foundUser.userName} a ajouté ${updatedOffer.plantName} à ses favoris !`,
+                message: `Si c'est un coup de cœur, peut-être que tu feras une vente ?`,
+              })
+              .catch((error) => console.error('Erreur notification push:', error))
+
+            const msg = {
+              to: offerAuthor.email,
+              from: {
+                email: process.env.SENDGRID_EMAIL_SENDER,
+                name: 'PlantB',
+              },
+              templateId: 'd-80a82623ce22424c83ae86c142013097',
+              dynamic_template_data: {
+                userName: offerAuthor.userName,
+                senderName: foundUser.userName,
+                plantName: updatedOffer.plantName,
+                picture: updatedOffer.pictures[0],
+                price: updatedOffer.price,
+              },
+            }
+
+            sgMail.send(msg).catch((error) => console.error('Erreur envoi email:', error))
+
+            // * Notification admin
+            const adminMsg = {
+              to: process.env.ADMIN_EMAIL_ADDRESS,
+              from: {
+                email: process.env.SENDGRID_EMAIL_SENDER,
+                name: 'PlantB',
+              },
+              templateId: 'd-c150579aa0fb408c8cb91c6d6477482b',
+              dynamic_template_data: {
+                userName: offerAuthor.userName,
+                senderName: foundUser.userName,
+                plantName: updatedOffer.plantName,
+              },
+            }
+
+            sgMail.send(adminMsg).catch((error) => console.error('Erreur envoi email:', error))
             return true
           } catch (error) {
             console.log('🤯error', error)

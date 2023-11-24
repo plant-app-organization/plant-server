@@ -8,6 +8,7 @@ export class ResetResolver {
   @Mutation(() => Boolean)
   async resetDatabase(): Promise<boolean> {
     // Liste de toutes vos opérations de suppression
+    await this.prisma.follow.deleteMany()
     await this.prisma.message.deleteMany()
     await this.prisma.conversation.deleteMany()
     await this.prisma.offer.deleteMany()
