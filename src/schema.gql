@@ -19,6 +19,8 @@ type UserModel {
   offerIds: [String!]!
   bookmarks: [String!]!
   conversations: [String!]!
+  followersIds: [String!]!
+  followingIds: [String!]!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -124,6 +126,8 @@ type Mutation {
   bookmarkOffer(offerId: String!): String!
   sendMessage(newMessageInput: MessageInput!): SendMessageResponse!
   resetDatabase: Boolean!
+  follow(followedUserId: String!): Boolean!
+  unfollow(followedUserId: String!): Boolean!
 }
 
 input RegisterInput {

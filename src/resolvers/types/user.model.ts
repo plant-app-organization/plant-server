@@ -51,6 +51,12 @@ export class UserModel implements UserClient {
   @Field(() => [String])
   conversations: string[]
 
+  @Field(() => [String])
+  followersIds: string[]
+
+  @Field(() => [String])
+  followingIds: string[]
+
   @Field(() => Date)
   createdAt: Date
 

@@ -6,6 +6,7 @@ import { User, Offer } from '@prisma/client'
 import clerk, { sessions } from '@clerk/clerk-sdk-node'
 import { Subscriber } from 'rxjs'
 import * as sgMail from '@sendgrid/mail'
+import axios from 'axios'
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
@@ -59,22 +60,30 @@ export class NewOfferResolver {
       })
       // console.log('updateUser', updateUser)
 
+      //! notif utilisateur et admin
       const msg = {
         //extract the email details
         to: foundUser.email,
-        from: process.env.SENDGRID_EMAIL_SENDER,
-        templateId: 'd-6512303bbdbb4ae88d9ba2b47b787c66',
+        from: {
+          email: process.env.SENDGRID_EMAIL_SENDER,
+          name: 'PlantB',
+        },
+        templateId: 'd-76757e76a01a4326a84a9e30c826aed7',
         //extract the custom fields
         dynamic_template_data: {
           plantName: newOffer.plantName,
           price: newOffer.price,
           picture: newOffer.pictures[0],
+          userName: foundUser.userName,
         },
       }
       const admin_msg = {
         //extract the email details
         to: process.env.ADMIN_EMAIL_ADDRESS,
-        from: process.env.SENDGRID_EMAIL_SENDER,
+        from: {
+          email: process.env.SENDGRID_EMAIL_SENDER,
+          name: 'PlantB',
+        },
         templateId: 'd-ea1d2cf084814c7f8072e6208c72a6d1',
         //extract the custom fields
         dynamic_template_data: {
@@ -106,6 +115,52 @@ export class NewOfferResolver {
         .catch((error) => {
           console.error(error.response.body)
         })
+      //! fin notif utilisateur et admin
+
+      //**Notif followers */
+      const followers = await this.prisma.user.findMany({
+        where: {
+          id: { in: foundUser.followersIds },
+        },
+        select: { userName: true, email: true },
+      })
+      for (let i = 0; i < followers.length; i++) {
+        const follower_msg = {
+          to: followers[i].email,
+          from: {
+            email: process.env.SENDGRID_EMAIL_SENDER,
+            name: 'PlantB',
+          },
+          templateId: 'd-75fa160c4efe4ff4841cc60caebca3f6',
+
+          dynamic_template_data: {
+            plantName: newOffer.plantName,
+            price: newOffer.price,
+            picture: newOffer.pictures[0],
+            userName: foundUser.userName,
+            followerName: followers[i].userName,
+          },
+        }
+        sgMail
+          .send(follower_msg)
+          .then(() => {
+            console.log('📨 Email envoyé au follower envoyé')
+          })
+          .catch((error) => {
+            console.error(error.response.body)
+          })
+        axios
+          .post(`https://app.nativenotify.com/api/indie/notification`, {
+            subID: followers[i].email,
+            appId: 15168,
+            appToken: '2NQv5UM3ppjj8VIDgMfgb4',
+            title: `${foundUser.userName} a publié une nouvelle annonce!`,
+            message: 'Soyez parmi les premiers à voir son annonce sur PlantB !',
+          })
+          .catch((error) => console.error('Erreur notification push:', error))
+      }
+
+      //**Fin notif followers */
       return !!newOffer
     } catch (error) {
       // If an error occurred, return false

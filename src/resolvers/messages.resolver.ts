@@ -112,7 +112,10 @@ export class MessagesResolver {
     // Envoi de l'email (ne pas attendre la réponse)
     const msg = {
       to: secondParticipant.email,
-      from: process.env.SENDGRID_EMAIL_SENDER,
+      from: {
+        email: process.env.SENDGRID_EMAIL_SENDER,
+        name: 'PlantB',
+      },
       templateId: 'd-82f09607fd314d32b3ee8960efce9f96',
       dynamic_template_data: {
         senderName: foundUser.userName,

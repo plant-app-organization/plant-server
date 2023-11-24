@@ -35,6 +35,10 @@ model User {
   bookmarks       String[]      @db.ObjectId
   conversations   String[]      @db.ObjectId
   messages        Message[]
+  followers       Follow[]      @relation("followerRelation")
+  followersIds    String[]      @db.ObjectId
+  following       Follow[]      @relation("followingRelation")
+  followingIds    String[]      @db.ObjectId
 
   @@map("users")
 }
@@ -175,4 +179,15 @@ model Message {
   createdAt      DateTime     @default(now())
 
   @@map("messages")
+}
+
+model Follow {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  follower   User     @relation("followerRelation", fields: [followerId], references: [id])
+  followerId String   @db.ObjectId
+  followed   User     @relation("followingRelation", fields: [followedId], references: [id])
+  followedId String   @db.ObjectId
+  createdAt  DateTime @default(now())
+
+  @@map("follows")
 }

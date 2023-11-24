@@ -17,6 +17,7 @@ import { GetSuggestionsResolver } from './resolvers/suggestions.resolver'
 import { GetOffersDataByIdsResolver } from './resolvers/getOffersDataByIds.resolver'
 import { MessagesResolver } from './resolvers/messages.resolver'
 import { ResetResolver } from './resolvers/resetDatabase.resolver'
+import { FollowResolver } from './resolvers/follow.resolver'
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ResetResolver } from './resolvers/resetDatabase.resolver'
     GetOffersDataByIdsResolver,
     MessagesResolver,
     ResetResolver,
+    FollowResolver,
   ],
 })
 export class AppModule {
