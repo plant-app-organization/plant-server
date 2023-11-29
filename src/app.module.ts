@@ -18,6 +18,7 @@ import { GetOffersDataByIdsResolver } from './resolvers/getOffersDataByIds.resol
 import { MessagesResolver } from './resolvers/messages.resolver'
 import { ResetResolver } from './resolvers/resetDatabase.resolver'
 import { FollowResolver } from './resolvers/follow.resolver'
+import { MailinglistController } from './mailinglist/mailinglist.controller'
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { FollowResolver } from './resolvers/follow.resolver'
       installSubscriptionHandlers: true,
     }),
   ],
-  controllers: [AppController],
+  controllers: [AppController, MailinglistController],
   providers: [
     PrismaService,
     AppService,
